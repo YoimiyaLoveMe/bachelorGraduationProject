@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>新增硬件</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+    <script type="text/html" id="indexTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+</head>
+<!--<body class="layui-layout-body"> 去掉样式后弹出页面拥有滚动条-->
+<body>
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-card-body" style="padding: 15px;">
+                <form class="layui-form layui-form-pane" action="">
+<!--                    <input name="id" th:value="${obj?.id}" class="layui-input layui-hide">&lt;!&ndash;当使用修改功能时，name为指向数据,th:value="${obj?.}意为收到修改信息&ndash;&gt;-->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">商品ID</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="id" name="id" th:value="${obj?.id}" readonly="readonly" placeholder="自动输入" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="name" th:value="${obj?.name}" lay-verify="required" placeholder="输入名称" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">品牌</label>
+                        <div class="layui-input-block">
+                            <select name="brand" lay-search>
+                                <option th:selected="${obj?.brand eq '利民'}" value="利民">利民</option>
+                                <option th:selected="${obj?.brand eq '超频三'}" value="超频三">超频三</option>
+                                <option th:selected="${obj?.brand eq '九州风神'}" value="九州风神">九州风神</option>
+                                <option th:selected="${obj?.brand eq '酷冷至尊'}" value="酷冷至尊">酷冷至尊</option>
+                                <option th:selected="${obj?.brand eq '安钛克'}" value="安钛克">安钛克</option>
+                                <option th:selected="${obj?.brand eq 'msi微星'}" value="msi微星">msi微星</option>
+                                <option th:selected="${obj?.brand eq '航嘉'}" value="航嘉">航嘉</option>
+                                <option th:selected="${obj?.brand eq '海盗船'}" value="海盗船">海盗船</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">最大风量</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="cfm" th:value="${obj?.cfm}" lay-verify="required" placeholder="数值(CFM)" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">散热器高度</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="size" th:value="${obj?.size}" lay-verify="required" placeholder="数值(mm)" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+<!--                    弹出隐藏式再次确认按钮-->
+                    <!--竟然会影响添加功能-->
+                    <div class="layui-form-item layui-hide">
+                        <input type="button" lay-submit lay-filter="LAY-front-submit" id="LAY-front-submit" value="确认">
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/static/layui/layui.js}"></script>
+    <script>
+        layui.use(['form'],function () {
+            var $ = layui.$;
+
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

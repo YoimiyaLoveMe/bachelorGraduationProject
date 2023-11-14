@@ -1,0 +1,39 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/onlineshop?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
+    username: root
+    password: wuyishuo
+    type: com.alibaba.druid.pool.DruidDataSource
+
+  mvc:
+    static-path-pattern: /static/**
+
+  thymeleaf:
+    prefix: classpath:/templates/
+    cache: false
+    #
+    enabled: true
+    encoding: utf-8
+    mode: HTML5
+    suffix: .html
+
+
+#mybatis:
+#  mapper-locations: classpath:mapping/*.xml
+mybatis-plus:
+  mapper-locations: classpath:mapping/*.xml
+  type-aliases-package:
+  # 自定义xml文件中用到的实体类路径
+#  type-aliases-package: com.example.shopping.entity
+#  configuration:
+#    # 开启驼峰映射
+#    map-underscore-to-camel-case: true
+#    cache-enabled: false
+#    # 返回map时，true:当查询数据为空时字段返回为null；false:不加这个查询数据为空时，字段将被隐藏
+#    call-setters-on-nulls: true
+#    # sql日志打印
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

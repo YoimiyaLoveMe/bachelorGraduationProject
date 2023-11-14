@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>采购单表</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/html" id="indexTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+</head>
+<body class="layui-layout-body">
+    <div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header">
+                    </div>
+                    <div class="layui-card-body">
+                        <table class="layui-hide" id="main-table" lay-filter="main-table"></table>
+                        <script type="text/html" id="toolbarDemo">
+                            <!--添加-->
+                            <span class="layui-inline" lay-event="add"><i class="layui-icon">&#xe654;</i> </span>
+                            <!--查询-->
+                            <span class="layui-inline" style="width: 240px;">
+                                <input class="layui-input" name="param" id="param" placeholder="采购商品名称查询" autocomplete="off">
+                            </span>
+                            <span class="layui-btn layui-btn-sm layui-bg-red" lay-event="querySearch">
+                                <i class="layui-icon">&#xe615;</i>查询
+                            </span>
+                        </script>
+
+                        <script type="text/html" id="barDemo">
+                            <a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>
+                            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">撤回</a>
+                        </script>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/static/layui/layui.js}"></script>
+    <script>
+        layui.use(['table','form'],function () {
+            var $ = layui.$;
+            var table = layui.table;
+            //定义当前页面表格
+            table.render({
+                elem: '#main-table',
+                height: 650,
+                url: '/purchase/purchaseQueryPage',
+                method: 'POST',
+                page: true,
+                id: 'table-load',
+                toolbar: '#toolbarDemo',
+                cols: [
+                    [
+                        {field: 'id', title: '供货编号', align: 'center',},
+                        {field: 'category', title: '商品类别', align: 'center',
+                            templet:function (line){
+                                if(line.category == 'motherboard'){
+                                    return '主板';
+                                }else if(line.category == 'cpu'){
+                                    return '芯片';
+                                }else if(line.category == 'graphicscard'){
+                                    return '显卡';
+                                }else if(line.category == 'ram'){
+                                    return '内存';
+                                }else if(line.category == 'ssd'){
+                                    return '固态硬盘';
+                                }else if(line.category == 'heatsink'){
+                                    return '散热器';
+                                }else if(line.category == 'power'){
+                                    return '电源';
+                                }else if(line.category == 'case'){
+                                    return '机箱';
+                                }
+                            }
+                        },
+                        {field: 'goodsId', title: '商品编号', align: 'center'},
+                        {field: 'goodsName', title: '商品名称', align: 'center'},
+                        {field: 'supplyId', title: '供货编号', align: 'center'},
+                        {field: 'supplierId', title: '供货商编号', align: 'center'},
+                        {field: 'supplierName', title: '供货商名称', align: 'center'},
+                        {field: 'price', title: '价格', align: 'center'},
+                        {field: 'number', title: '数量', align: 'center'},
+                        {field: 'sumPrice', title: '总金额', align: 'center'},
+                        {field: 'information', title: '备注信息', align: 'center'},
+                        {field: 'examineId', title: '审核者ID', align: 'center'},
+                        {field: 'state', title: '进度', align: 'center'},
+                        {title: '操作', align: 'center', toolbar: '#barDemo', fixed: 'right',width:'7%'},
+                    ]
+                ]
+            });
+            //监听头工具栏事件（添加，查询）
+            table.on('toolbar(main-table)', function (obj) {
+                switch (obj.event) {
+                    //添加
+                    case 'add':
+                        layer.open({
+                            type: 2,
+                            title: '新增采购订单',
+                            content: '/purchase/purchasePage',//指向页面地址
+                            shade: [0.8, '#393d49'],//透明度
+                            area: ['800px', '800px'],
+                            btn: ['提交', '取消'],
+                            yes: function (index, layero) {
+                                var iframeWindow = window['layui-layer-iframe' + index];
+                                var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                //监听提交
+                                iframeWindow.layui.form.on('submit(LAY-front-submit)', function (data) {
+                                    var field = data.field;
+                                    //计算总金额
+                                    field.sumPrice = field.price * field.number;
+                                    $.ajax({
+                                        url: '/purchase/purchaseAdd',
+                                        data: field,
+                                        async: false,//是否异步
+                                        cache: false,//缓存
+                                        success: function (str) {
+                                            if (str.code === 0) {
+                                                table.reload('table-load');
+                                            }
+                                            layer.msg(str.msg, {icon: str.icon, anim: str.anim});
+                                        }
+                                    });
+                                    layer.close(index);
+                                });
+                                submit.trigger('click');
+                            },
+                            success: function (layero, index) {
+                            }
+                        });
+                        break;
+
+                    //查询
+                    case 'querySearch':
+                        var param = $('#param').val();
+                        table.reload('table-load', {
+                            where: {
+                                param: param
+                            }
+                        });
+                        $('#param').val(param);
+                        break;
+                }
+            });
+            // //监听修改和删除功能
+            table.on('tool(main-table)',function (obj) {
+                var data = obj.data;
+                switch (obj.event) {
+                    case 'edit':
+                        if(data.state == '待审核' || data.state == '已打回'){
+                            layer.open({
+                                type: 2,
+                                title: '供货修改',
+                                content: '/purchase/purchaseQueryById?id=' +data.id,
+                                shade:[0.8,'#393d49'],
+                                area:['600px','400px'],
+                                btn:['确定','取消'],
+                                yes:function (index,layero) {
+                                    var iframeWindow = window['layui-layer-iframe'+index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)',function (data) {
+                                        var field = data.field;
+                                        field.sumPrice = field.price * field.number;
+                                        $.ajax({
+                                            url: '/purchase/purchaseEdit',
+                                            data: field,
+                                            async: false,
+                                            cache: false,
+                                            success: function (str) {
+                                                if(str.code === 0){
+                                                    table.reload('table-load');
+                                                }
+                                                layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                            }
+                                        });
+                                        layer.close(index);
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success:function (layero,index) {
+
+                                }
+                            });
+                        }else alert("不可更改")
+
+                        break;
+                    case 'del':
+                        if(data.state != '已通过' && data.state != '已完成'){
+                            layer.confirm('确认撤回？',function (index) {
+                                $.ajax({
+                                    url: '/purchase/purchaseDelById?id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+                        }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

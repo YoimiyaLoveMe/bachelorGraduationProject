@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>新增硬件</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+    <script type="text/html" id="indexTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+</head>
+<!--<body class="layui-layout-body"> 去掉样式后弹出页面拥有滚动条-->
+<body>
+<!--
+        错误日志
+        @author: wu
+        2022.3.27.23:07
+        报错信息: There was an unexpected error (type=Internal Server Error, status=500).An error happened during template parsing (template: "class path resource [templates//motherboardPage.html]")
+        问题描述: 模板解析过程错误。初始认为是‘新增’页面错误，但‘新增’页面与‘修改’页面共用代码，‘修改’功能正常。后认为是‘新增’功能错误,检查controller和service皆无错误，url和content正常指向。最终对比发现${obj.*}存疑，但其在’修改‘页面正常。
+        问题解决: 所有${obj.*}替换为${obj?.*}
+        留存疑惑: ${obj.*}替换为${obj?.*}有何区别
+-->
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-card-body" style="padding: 15px;">
+                <form class="layui-form layui-form-pane" action="">
+<!--                    <input name="id" th:value="${obj?.id}" class="layui-input layui-hide">&lt;!&ndash;当使用修改功能时，name为指向数据,th:value="${obj?.}意为收到修改信息&ndash;&gt;-->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">商品ID</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="id" name="id" th:value="${obj?.id}" readonly="readonly" placeholder="自动输入" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">名称</label>
+                        <div class="layui-input-block">
+<!--                            lay-verify="required":必填项-->
+                            <input type="text" id="name" name="name" th:value="${obj?.name}" lay-verify="required" placeholder="输入名称" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">品牌</label>
+                        <div class="layui-input-block">
+                            <select name="brand" lay-search>
+                                <option th:selected="${obj?.brand eq '华硕'}" value="华硕">华硕</option>
+                                <option th:selected="${obj?.brand eq '铭瑄'}" value="铭瑄">铭瑄</option>
+                                <option th:selected="${obj?.brand eq '华擎'}" value="华擎">华擎</option>
+                                <option th:selected="${obj?.brand eq '技嘉'}" value="技嘉">技嘉</option>
+                                <option th:selected="${obj?.brand eq '七彩虹'}" value="七彩虹">七彩虹</option>
+                                <option th:selected="${obj?.brand eq '影驰'}" value="影驰">影驰</option>
+                                <option th:selected="${obj?.brand eq 'msi微星'}" value="msi微星">msi微星</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">主芯片组</label>
+                        <div class="layui-input-block">
+                            <select name="chipset">
+                                <option th:selected="${obj?.chipset eq 'Intel'}" value="Intel">Intel</option>
+                                <option th:selected="${obj?.chipset eq 'AMD'}" value="AMD">AMD</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">cpu插槽</label>
+                        <div class="layui-input-block">
+                            <select name="cpuSlot">
+                                <option th:selected="${obj?.cpuSlot eq 'LGA 1200'}" value="LGA 1200">LGA 1200</option>
+                                <option th:selected="${obj?.cpuSlot eq 'LGA 1700'}" value="LGA 1700">LGA 1700</option>
+                                <option th:selected="${obj?.cpuSlot eq 'LGA 2066'}" value="LGA 2066">LGA 2066</option>
+                                <option th:selected="${obj?.cpuSlot eq 'Socket AM3'}" value="Socket AM3">Socket AM3</option>
+                                <option th:selected="${obj?.cpuSlot eq 'Socket AM3+'}" value="Socket AM3+">Socket AM3+</option>
+                                <option th:selected="${obj?.cpuSlot eq 'Socket AM4'}" value="Socket AM4">Socket AM4</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">板型</label>
+                        <div class="layui-input-block">
+                            <select name="boardType">
+                                <option th:selected="${obj?.boardType eq 'E-ATX'}" value="E-ATX">E-ATX（加强型）</option>
+                                <option th:selected="${obj?.boardType eq 'ATX'}" value="ATX">ATX（标准型）</option>
+                                <option th:selected="${obj?.boardType eq 'M-ATX'}" value="M-ATX">M-ATX（紧凑型）</option>
+                                <option th:selected="${obj?.boardType eq 'ITX'}" value="ITX">ITX（迷你型）</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">内存类型</label>
+                        <div class="layui-input-block">
+                            <select name="memoryType">
+                                <option th:selected="${obj?.memoryType eq 'DDR5'}" value="DDR5">DDR5</option>
+                                <option th:selected="${obj?.memoryType eq 'DDR4'}" value="DDR4">DDR4</option>
+                                <option th:selected="${obj?.memoryType eq 'DDR3'}" value="DDR3">DDR3</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">最大内存容量</label>
+                        <div class="layui-input-block">
+                            <select name="memoryVolume" lay-search>
+                                <option th:selected="${obj?.memoryVolume eq 256}" value="256">256GB</option>
+                                <option th:selected="${obj?.memoryVolume eq 128}" value="128">128GB</option>
+                                <option th:selected="${obj?.memoryVolume eq 64}" value="64">64GB</option>
+                                <option th:selected="${obj?.memoryVolume eq 32}" value="32">32GB</option>
+                                <option th:selected="${obj?.memoryVolume eq 16}" value="16">16GB</option>
+                                <option th:selected="${obj?.memoryVolume eq 8}" value="8">8GB</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">PCI-E标准</label>
+                        <div class="layui-input-block">
+                            <select name="pciE">
+                                <option th:selected="${obj?.pciE eq 5}" value="5.0">PCI-E 5.0</option>
+                                <option th:selected="${obj?.pciE eq 4}" value="4.0">PCI-E 4.0</option>
+                                <option th:selected="${obj?.pciE eq 3}" value="3.0">PCI-E 3.0</option>
+                                <option th:selected="${obj?.pciE eq 2}" value="2.0">PCI-E 2.0</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">存储接口</label>
+                        <div class="layui-input-block">
+                            <select name="storageInterface">
+                                <option th:selected="${obj?.storageInterface eq 'M.2接口'}" value="M.2接口">M.2接口</option>
+                                <option th:selected="${obj?.storageInterface eq 'SATA3.0接口'}" value="SATA3.0接口">SATA3.0接口</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">供电接口</label>
+                        <div class="layui-input-block">
+                            <select name="powerInterface">
+                                <option th:selected="${obj?.powerInterface eq '8相以上供电'}" value="8相以上供电">8相以上供电</option>
+                                <option th:selected="${obj?.powerInterface eq '7-8相供电'}" value="7-8相供电">7-8相供电</option>
+                                <option th:selected="${obj?.powerInterface eq '4-6相供电'}" value="4-6相供电">4-6相供电</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">cpu辅助供电接口</label>
+                        <div class="layui-input-block">
+                            <select name="cpuPowerInterface">
+                                <option th:selected="${obj?.cpuPowerInterface eq '8相供电'}" value="8相供电">8相供电</option>
+                                <option th:selected="${obj?.cpuPowerInterface eq '4相供电'}"  value="4相供电">4相供电</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">支持wifi</label>
+                        <div class="layui-input-block">
+                            <select name="isWifi">
+                                <option th:selected="${obj?.isWifi eq 1}" value="1">支持</option>
+                                <option th:selected="${obj?.isWifi eq 0}" value="0">不支持</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">支持超频</label>
+                        <div class="layui-input-block">
+                            <select name="isSuper">
+                                <option th:selected="${obj?.isSuper eq 1}" value="1">支持</option>
+                                <option th:selected="${obj?.isSuper eq 0}" value="0">不支持</option>
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <!--弹出隐藏式再次确认按钮,由父页面监听触发-->
+                    <div class="layui-form-item layui-hide">
+                        <input type="button" lay-submit lay-filter="LAY-front-submit" id="LAY-front-submit" value="确认">
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/static/layui/layui.js}"></script>
+    <script>
+        //传递给主页的表单对象
+        layui.use(['form'],function () {
+            var $ = layui.$;
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>智能装机算法管理</title>
+    <!--销售管理页通用修改页面-->
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+    <script type="text/html" id="indexTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+</head>
+<!--<body class="layui-layout-body"> 去掉样式后弹出页面拥有滚动条-->
+<body>
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-card-body" style="padding: 15px;">
+                <form class="layui-form layui-form-pane" action="">
+                    <div>
+                        <h1>遗传算法基础参数</h1>
+                        <h3>Genetic Algorithm，GA</h3>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">迭代次数</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="Iteration" th:value="${obj?.iteration}" lay-verify="required" placeholder="推荐不大于100" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">环境容纳量</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="environmentalCapacity" th:value="${obj?.environmentalCapacity}" lay-verify="required" placeholder="推荐不大于100" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">交叉率</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="Crossover" th:value="${obj?.crossover}" lay-verify="required" placeholder="推荐0.4至0.99" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">变异率</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="Mutation" th:value="${obj?.mutation}" lay-verify="required" placeholder="推荐不大于0.01" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div>
+                        <h1>约束性限制(罚函数)</h1>
+                        <h3>SequentialUnconstrainedMinimizationTechnique</h3>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">兼容性错误罚系数值(外部罚函数的罚因子)</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="techLimit" th:value="${obj?.techLimit}" lay-verify="required" placeholder="(0-1)" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">允许价格偏移率(价格范围)</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="priceRatio" th:value="${obj?.priceRatio}" lay-verify="required" placeholder="推荐不超过0.2" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">价格偏高罚系数值(内部罚函数的罚因子)</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="priceULimit" th:value="${obj?.priceULimit}" lay-verify="required" placeholder="(0-1)" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">价格偏低罚系数值(内部罚函数的罚因子)</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="priceDLimit" th:value="${obj?.priceDLimit}" lay-verify="required" placeholder="(0-1)" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="AIAC">立即提交</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/static/layui/layui.js}"></script>
+    <script>
+        layui.use(['form'],function () {
+            var $ = layui.$;
+            var form = layui.form;
+            form.on("submit(AIAC)",function(data){
+                layer.confirm('确认修改？',function (index) {
+                    $.ajax({
+                        url: '/AIACPage/editAIAC',
+                        type: 'POST',
+                        data: data.field,
+                        dataType: 'json',
+                        success:function (result){
+                            if(result.code == "1"){
+                                layer.msg(result.msg,{icon:result.icon,anim:result.anim},function (){
+                                });
+                            }
+                            else {
+                                layer.msg(result.msg,{icon: result.icon,anim:result.anim});
+                            }
+                        }
+                    });
+                })
+                return false;
+            });
+
+        });
+    </script>
+<style>
+    .layui-form-label {
+        width: 300px !important;
+        text-align: center !important;
+    }
+    .layui-input-block {
+         margin-left: 300px !important; /*margin_left左侧边距*/
+    }
+
+</style>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>新增硬件</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+    <script type="text/html" id="indexTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+</head>
+<!--<body class="layui-layout-body"> 去掉样式后弹出页面拥有滚动条-->
+<body>
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-card-body" style="padding: 15px;">
+                <form class="layui-form layui-form-pane" action="">
+<!--                    <input name="id" th:value="${obj?.id}" class="layui-input layui-hide">&lt;!&ndash;当使用修改功能时，name为指向数据,th:value="${obj?.}意为收到修改信息&ndash;&gt;-->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">商品ID</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="id" name="id" th:value="${obj?.id}" readonly="readonly" placeholder="自动输入" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="name" th:value="${obj?.name}" lay-verify="required" placeholder="输入名称" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">品牌</label>
+                        <div class="layui-input-block">
+                            <select name="brand" lay-search>
+                                <option th:selected="${obj?.brand eq '航嘉'}" value="航嘉">航嘉</option>
+                                <option th:selected="${obj?.brand eq '华硕'}" value="华硕">华硕</option>
+                                <option th:selected="${obj?.brand eq 'msi微星'}" value="msi微星">msi微星</option>
+                                <option th:selected="${obj?.brand eq '海盗船'}" value="海盗船">海盗船</option>
+                                <option th:selected="${obj?.brand eq '安钛克'}" value="安钛克">安钛克</option>
+                                <option th:selected="${obj?.brand eq '爱国者'}" value="爱国者">爱国者</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">尺寸</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="size" th:value="${obj?.size}" lay-verify="required" placeholder="L*W*H(mm)" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">结构</label>
+                        <div class="layui-input-block">
+                            <select name="structure">
+                                <option th:selected="${obj?.structure eq 'E-ATX'}" value="E-ATX">E-ATX</option>
+                                <option th:selected="${obj?.structure eq 'ATX'}" value="ATX">ATX</option>
+                                <option th:selected="${obj?.structure eq 'M-ATX'}" value="M-ATX">M-ATX</option>
+                                <option th:selected="${obj?.structure eq 'ITX'}" value="ITX">ITX</option>
+                                <option th:selected="${obj?.structure eq 'RTX'}" value="RTX">RTX</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">主板板型限制</label>
+                        <div class="layui-input-block">
+                            <select name="mbLimit">
+                                <option th:selected="${obj?.mbLimit eq 'E-ATX'}" value="E-ATX">E-ATX（加强型）</option>
+                                <option th:selected="${obj?.mbLimit eq 'ATX'}" value="ATX">ATX（标准型）</option>
+                                <option th:selected="${obj?.mbLimit eq 'M-ATX'}" value="M-ATX">M-ATX（紧凑型）</option>
+                                <option th:selected="${obj?.mbLimit eq 'ITX'}" value="ITX">ITX（迷你型）</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">散热器限高</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="htLimit" th:value="${obj?.htLimit}" lay-verify="required" placeholder="限制高度(mm))" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">显卡限长</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="gcLimit" th:value="${obj?.gcLimit}" lay-verify="required" placeholder="限制长度(mm)" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">电源限制</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="pwLimit" th:value="${obj?.pwLimit}" lay-verify="required" placeholder="L*W*H(mm)" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">pci拓展槽</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="pciSlot" th:value="${obj?.pciSlot}" lay-verify="required" placeholder="数量" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+<!--                    弹出隐藏式再次确认按钮-->
+                    <!--竟然会影响添加功能-->
+                    <div class="layui-form-item layui-hide">
+                        <input type="button" lay-submit lay-filter="LAY-front-submit" id="LAY-front-submit" value="确认">
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/static/layui/layui.js}"></script>
+    <script>
+        layui.use(['form'],function () {
+            var $ = layui.$;
+
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

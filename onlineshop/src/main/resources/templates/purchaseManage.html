@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>采购单表</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/html" id="indexTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+</head>
+<body class="layui-layout-body">
+    <div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header">
+                    </div>
+                    <div class="layui-card-body">
+                        <table class="layui-hide" id="main-table" lay-filter="main-table"></table>
+                        <script type="text/html" id="toolbarDemo">
+                            <!--添加-->
+<!--                            <span class="layui-inline" lay-event="add"><i class="layui-icon">&#xe654;</i> </span>-->
+                            <!--查询-->
+                            <span class="layui-inline" style="width: 240px;">
+                                <input class="layui-input" name="param" id="param" placeholder="采购商品名称查询" autocomplete="off">
+                            </span>
+                            <span class="layui-btn layui-btn-sm layui-bg-red" lay-event="querySearch">
+                                <i class="layui-icon">&#xe615;</i>查询
+                            </span>
+                        </script>
+
+                        <script type="text/html" id="barDemo">
+                            <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="refuse">打回</a>
+                            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="examine">通过</a>
+                        </script>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/static/layui/layui.js}"></script>
+    <script>
+        layui.use(['table','form'],function () {
+            var $ = layui.$;
+            var table = layui.table;
+            //定义当前页面表格
+            table.render({
+                elem: '#main-table',
+                height: 650,
+                url: '/purchaseManage/purchaseQueryPage',
+                method: 'POST',
+                page: true,
+                id: 'table-load',
+                toolbar: '#toolbarDemo',
+                cols: [
+                    [
+                        {field: 'id', title: '供货编号', align: 'center',},
+                        {field: 'category', title: '商品类别', align: 'center',
+                            templet:function (line){
+                                if(line.category == 'motherboard'){
+                                    return '主板';
+                                }else if(line.category == 'cpu'){
+                                    return '芯片';
+                                }else if(line.category == 'graphicscard'){
+                                    return '显卡';
+                                }else if(line.category == 'ram'){
+                                    return '内存';
+                                }else if(line.category == 'ssd'){
+                                    return '固态硬盘';
+                                }else if(line.category == 'heatsink'){
+                                    return '散热器';
+                                }else if(line.category == 'power'){
+                                    return '电源';
+                                }else if(line.category == 'case'){
+                                    return '机箱';
+                                }
+                            }
+                        },
+                        {field: 'goodsId', title: '商品编号', align: 'center'},
+                        {field: 'goodsName', title: '商品名称', align: 'center'},
+                        {field: 'supplyId', title: '供货编号', align: 'center'},
+                        {field: 'supplierId', title: '供货商编号', align: 'center'},
+                        {field: 'supplierName', title: '供货商名称', align: 'center'},
+                        {field: 'price', title: '价格', align: 'center'},
+                        {field: 'number', title: '数量', align: 'center'},
+                        {field: 'sumPrice', title: '总金额', align: 'center'},
+                        {field: 'information', title: '备注信息', align: 'center'},
+                        {field: 'purchaseId', title: '申请者ID', align: 'center'},
+                        {field: 'state', title: '进度', align: 'center'},
+                        {title: '操作', align: 'center', toolbar: '#barDemo', fixed: 'right'},
+                    ]
+                ]
+            });
+            //监听头工具栏事件（添加，查询）
+            table.on('toolbar(main-table)', function (obj) {
+                switch (obj.event) {
+                    //查询
+                    case 'querySearch':
+                        var param = $('#param').val();
+                        table.reload('table-load', {
+                            where: {
+                                param: param
+                            }
+                        });
+                        $('#param').val(param);
+                        break;
+                }
+            });
+            // //监听修改和删除功能
+            table.on('tool(main-table)',function (obj) {
+                var data = obj.data;
+                switch (obj.event) {
+                    case 'refuse':
+                        if(data.state == '待审核'){
+                            layer.confirm('确认打回？',function (index) {
+                                $.ajax({
+                                    url: '/purchaseManage/purchaseRefuseById?id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                        }else alert("不可更改")
+                        break;
+                    case 'examine':
+                        layer.confirm('确认通过？',function (index) {
+                            if(data.state == '待审核'){
+                                $.ajax({
+                                    url: '/purchaseManage/purchaseExamineById?id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            }else alert("不可更改")
+                        })
+                        break;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

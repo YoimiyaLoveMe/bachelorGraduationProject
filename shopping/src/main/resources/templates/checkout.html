@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		 <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+		<title>Electro - HTML Ecommerce Template</title>
+
+ 		<!-- Google font -->
+ 		<link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
+
+ 		<!-- Bootstrap -->
+		<link type="text/css" rel="stylesheet" th:href="@{/static/shop/css/bootstrap.min.css}"/>
+
+		<!-- Slick -->
+		<link type="text/css" rel="stylesheet" th:href="@{/static/shop/css/slick.css}"/>
+		<link type="text/css" rel="stylesheet" th:href="@{/static/shop/css/slick-theme.css}"/>
+
+		<!-- nouislider -->
+		<link type="text/css" rel="stylesheet" th:href="@{/static/shop/css/nouislider.min.css}"/>
+
+		<!-- Font Awesome Icon -->
+		<link rel="stylesheet" th:href="@{/static/shop/css/font-awesome.min.css}">
+
+		<!-- Custom stlylesheet -->
+		<link type="text/css" rel="stylesheet" th:href="@{/static/shop/css/style.css}"/>
+
+		<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]-->
+<!--		  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>-->
+<!--		  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>-->
+		<!--[endif]-->
+		<link rel="stylesheet" th:href="@{../static/layui/css/layui.css}" media="all">
+		<link rel="stylesheet" th:href="@{../static/admin/style.css}" media="all">
+		<script th:src="@{../static/layui/layui.js}"></script>
+
+    </head>
+	<body>
+		<!-- HEADER -->
+		<header>
+			<!-- TOP HEADER -->
+			<div id="top-header">
+				<div class="container">
+					<ul class="header-links pull-left" id="door">
+
+					</ul>
+					<ul class="header-links pull-right">
+						<li><a id="order"><i class="fa fa-dollar"></i>我的订单</a></li>
+						<li><a id="account"><i class="fa fa-first-order"></i>我的账户</a></li>
+					</ul>
+				</div>
+			</div>
+			<!-- /TOP HEADER -->
+
+			<!-- MAIN HEADER -->
+			<div id="header">
+				<!-- container -->
+				<div class="container">
+					<!-- row -->
+					<div class="row">
+						<!-- LOGO -->
+						<div class="col-md-3">
+							<div class="header-logo">
+								<a href="/index" class="logo">
+									<img th:src="@{../static/shop/img/index.png}" alt="">
+								</a>
+							</div>
+						</div>
+						<!-- /LOGO -->
+
+						<!-- SEARCH BAR -->
+						<div class="col-md-5">
+							<div class="header-search">
+								<form>
+									<select class="input-select">
+										<option value="">All Categories</option>
+										<option value="motherboard">主板</option>
+										<option value="cpu">芯片</option>
+										<option value="graphics_card">显卡</option>
+										<option value="ram">内存</option>
+										<option value="ssd">硬盘</option>
+										<option value="heatsink">散热器</option>
+										<option value="power">电源</option>
+										<option value="case">机箱</option>
+									</select>
+									<input class="input" placeholder="商品名称">
+									<button class="search-btn">搜索</button>
+								</form>
+							</div>
+						</div>
+						<!-- /SEARCH BAR -->
+
+						<!-- ACCOUNT -->
+						<div class="col-md-4 clearfix">
+							<div class="header-ctn">
+
+								<!-- Menu Toogle -->
+								<div>
+									<a href="#">
+										<i class="fa fa-bars"></i>
+										<span>商品列表</span>
+									</a>
+								</div>
+								<!-- /Menu Toogle -->
+
+								<!-- Wishlist -->
+								<div>
+									<a href="/goods/customer?type=love">
+										<i class="fa fa-heart-o"></i>
+										<span>心愿单</span>
+										<div class="qty" id="loveNumber"></div>
+									</a>
+								</div>
+								<!-- /Wishlist -->
+
+								<!-- Cart -->
+								<div>
+									<a href="/goods/customer?type=cart">
+										<i class="fa fa-shopping-cart"></i>
+										<span>购物车</span>
+										<div class="qty" id="cartNumber"></div>
+									</a>
+								</div>
+							</div>
+							<!-- /Cart -->
+
+						</div>
+					</div>
+					<!-- /ACCOUNT -->
+				</div>
+				<!-- row -->
+			</div>
+			<!-- container -->
+			</div>
+			<!-- /MAIN HEADER -->
+		</header>
+		<!-- /HEADER -->
+
+		<!-- BREADCRUMB -->
+		<div id="breadcrumb" class="section">
+			<!-- container -->
+			<div class="container">
+				<!-- row -->
+				<div class="row">
+					<div class="col-md-12">
+						<h3 class="breadcrumb-header">结算</h3>
+					</div>
+				</div>
+				<!-- /row -->
+			</div>
+			<!-- /container -->
+		</div>
+		<!-- /BREADCRUMB -->
+
+		<!-- SECTION -->
+		<div class="section">
+			<!-- container -->
+			<div class="container">
+				<!-- row -->
+				<div class="row">
+
+					<div class="col-md-7">
+						<!-- Billing Details -->
+						<div class="billing-details">
+							<div class="section-title">
+								<h3 class="title">用户信息</h3>
+							</div>
+							<div class="form-group">
+								<input class="input" type="text" name="name" placeholder="用户" readonly="readonly" id="id">
+							</div>
+							<div class="form-group">
+								<input class="input" type="tel" name="id" placeholder="账号" readonly="readonly" id="name">
+							</div>
+							<div class="form-group">
+								<div class="section-title">
+									<h3 class="title">配送信息</h3>
+								</div>
+								<div class="form-group">
+									<select class="input-select" name="address" id="address">
+
+									</select>
+								</div>
+<!--								<div class="input-checkbox">-->
+<!--									<input type="checkbox" id="create-account">-->
+<!--									<label for="create-account">-->
+<!--										<span></span>-->
+<!--										使用其它地址-->
+<!--									</label>-->
+<!--									<div class="caption">-->
+<!--										<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt.</p>-->
+<!--										<input class="input" type="address" name="ex-address" placeholder="输入地址">-->
+<!--									</div>-->
+<!--								</div>-->
+							</div>
+						</div>
+						<!-- /Billing Details -->
+					</div>
+
+					<!-- Order Details -->
+					<div class="col-md-5 order-details">
+						<div class="section-title text-center">
+							<h3 class="title">你的订单</h3>
+						</div>
+						<div class="order-summary">
+							<div class="order-col">
+								<div><strong>商品列表</strong></div>
+								<div><strong>价格</strong></div>
+							</div>
+							<div class="order-products">
+								<div class="order-col">
+									<div th:text="${number}+' X '+${obj?.name}"></div>
+									<div th:text="'￥'+${obj?.salePrice}"></div>
+								</div>
+							</div>
+							<div class="order-col">
+								<div>原价</div>
+								<div ><strong th:text="'￥'+${obj?.price}"></strong></div>
+							</div>
+							<div class="order-col">
+								<div><strong>总计</strong></div>
+								<div><strong class="order-total" th:text="'￥'+${number}*${obj?.salePrice}" id="sumPrice"></strong><del class="product-old-price" th:text="'￥'+${number}*${obj?.price}" id="sumSalePrice"></del></div>
+							</div>
+						</div>
+						<div class="payment-method">
+							<div class="input-radio">
+								<input type="radio" name="payment" id="payment-1" value="Alipay">
+								<label for="payment-1">
+									<span></span>
+									支付宝
+								</label>
+								<div class="caption">
+									<p>请确保你已开通支付宝支付功能</p>
+								</div>
+							</div>
+							<div class="input-radio">
+								<input type="radio" name="payment" id="payment-2" value="WechatPay">
+								<label for="payment-2">
+									<span></span>
+									微信
+								</label>
+								<div class="caption">
+									<p>请确保你已开通微信支付功能</p>
+								</div>
+							</div>
+						</div>
+						<div class="input-checkbox">
+							<input type="checkbox" id="terms" value="yes">
+							<label for="terms">
+								<span></span>
+								我已阅读并接受<a href="#">《交易协议》</a>
+							</label>
+						</div>
+						<a id="submit" class="primary-btn order-submit">提交订单</a>
+					</div>
+					<!-- /Order Details -->
+				</div>
+				<!-- /row -->
+			</div>
+			<!-- /container -->
+		</div>
+		<!-- /SECTION -->
+
+		<!-- FOOTER -->
+		<footer id="footer">
+			<!-- top footer -->
+			<div class="section">
+				<!-- container -->
+				<div class="container">
+					<!-- row -->
+					<div class="row">
+						<div class="col-md-3 col-xs-6">
+							<div class="footer">
+								<h3 class="footer-title">About Us</h3>
+								<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut.</p>
+								<ul class="footer-links">
+									<li><a href="#"><i class="fa fa-map-marker"></i>1734 Stonecoal Road</a></li>
+									<li><a href="#"><i class="fa fa-phone"></i>+021-95-51-84</a></li>
+									<li><a href="#"><i class="fa fa-envelope-o"></i>email@email.com</a></li>
+								</ul>
+							</div>
+						</div>
+
+						<div class="col-md-3 col-xs-6">
+							<div class="footer">
+								<h3 class="footer-title">Categories</h3>
+								<ul class="footer-links">
+									<li><a href="#">Hot deals</a></li>
+									<li><a href="#">Laptops</a></li>
+									<li><a href="#">Smartphones</a></li>
+									<li><a href="#">Cameras</a></li>
+									<li><a href="#">Accessories</a></li>
+								</ul>
+							</div>
+						</div>
+
+						<div class="clearfix visible-xs"></div>
+
+						<div class="col-md-3 col-xs-6">
+							<div class="footer">
+								<h3 class="footer-title">Information</h3>
+								<ul class="footer-links">
+									<li><a href="#">About Us</a></li>
+									<li><a href="#">Contact Us</a></li>
+									<li><a href="#">Privacy Policy</a></li>
+									<li><a href="#">Orders and Returns</a></li>
+									<li><a href="#">Terms & Conditions</a></li>
+								</ul>
+							</div>
+						</div>
+
+						<div class="col-md-3 col-xs-6">
+							<div class="footer">
+								<h3 class="footer-title">Service</h3>
+								<ul class="footer-links">
+									<li><a href="#">My Account</a></li>
+									<li><a href="#">View Cart</a></li>
+									<li><a href="#">Wishlist</a></li>
+									<li><a href="#">Track My Order</a></li>
+									<li><a href="#">Help</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<!-- /row -->
+				</div>
+				<!-- /container -->
+			</div>
+			<!-- /top footer -->
+		</footer>
+		<!-- /FOOTER -->
+
+		<!-- jQuery Plugins -->
+<script th:src="@{/static/shop/js/jquery.min.js}"></script>
+<script th:src="@{/static/shop/js/bootstrap.min.js}"></script>
+<script th:src="@{/static/shop/js/slick.min.js}"></script>
+<script th:src="@{/static/shop/js/nouislider.min.js}"></script>
+<script th:src="@{/static/shop/js/jquery.zoom.min.js}"></script>
+<script th:src="@{/static/shop/js/main.js}"></script>
+<script th:src="@{/static/shop/js/vue.js}"></script>
+
+<!--进入页面获取当前用户，并分别渲染页面顶端-->
+<script>
+	$(document).ready(function(){
+		$.ajax({
+			url: '/getUser',
+			type: 'GET',
+			dataType: 'json',
+			async: false,
+			cache: false,
+			success: function (user) {
+				$("#door").html("<li><i class=\"fa fa-user-o\"><a onclick='safe()'>" + user.name + "</a></li>\r" +
+						"<li><i class=\"fa fa-warning\"></i><a href=\"/logout\">" + "退出" + "</a></li>");
+				//渲染固定数据
+				$("#id").val(user.id);
+				$("#name").val(user.name);
+				$.ajax({
+					url: '/shop/getLoveAndCart?id='+user.id,
+					type: 'GET',
+					async: false,
+					cache: false,
+					success: function (list){
+						$("#loveNumber").text(list[0]);
+						$("#cartNumber").text(list[1]);
+					}
+				})
+			},
+			error: function (){
+				alert("还未登录！");
+				location.href="/login";
+			}
+		})
+	})
+</script>
+
+<!--获取当前用户的收货地址-->
+<script>
+	$(document).ready(function(){
+		$.ajax({
+			url: '/shop/getAddress',
+			type: 'GET',
+			dataType: 'json',
+			async: false,
+			cache: false,
+			success: function (list) {
+				$("#address").empty();
+				for (var i = 0; i < list.length; i++) {
+						$('#address').append("<option value='" + list[i] + "'>" + list[i] + "</option>");
+				}
+				form.render();
+			},
+			error: function (){
+				alert("还未登录！");
+				location.href="/login"
+			}
+		})
+	})
+</script>
+
+<!--点击结算后弹出付款窗口，付款窗口关闭后自动返回首页-->
+<script>
+	$(document).ready(function(){
+		$("#submit").click(function (){
+			var pay=document.getElementsByName("payment");
+			//遍历单选框(支付方式)
+			for (var i=0;i<pay.length;i++){
+				if(pay[i].checked){
+					var check = pay[i].value;
+				}
+			}
+			if(check == undefined){
+				alert("请选择支付方式!");
+			}else if ($("#terms").is(":checked") ==false){//判断选择框是否选中
+				alert("请阅读并勾选同意协议!");
+			}else {
+				$.ajax({
+					url: '/goods/orderRetail',
+					type: 'POST',
+					data:{
+						goodsid: [[${obj.id}]],
+						number: [[${number}]],
+						address: $("#address").val(),
+					},
+					dataType: 'json',
+					async: false,
+					cache: false,
+					success: function (data) {
+						if(data != null){
+							layui.use(['table','layer'],function () {
+								var $ = layui.$;
+								var layer = layui.layer;
+								layer.open({
+									type: 2,
+									title: '付款页面',
+									content: '/goods/payPage?id=' + data + '&check=' + check,
+									shade: [0.8, '#393d49'],//透明度
+									area: ['600px', '750px'],
+									btn: ['模拟付款成功', '暂不付款'],
+									yes: function (index, layero) {
+										var iframeWindow = window['layui-layer-iframe' + index];
+										var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+										//监听提交(模拟付款成功)
+										iframeWindow.layui.form.on('submit(LAY-front-submit)', function (data) {
+											//alert(1);
+											$.ajax({
+												url: '/goods/pay',
+												data: data.field,
+												async: false,//是否异步
+												cache: false,//缓存
+												success: function (str) {
+													if (str.code === 0) {
+														layer.msg(str.msg,{icon:str.icon,anim:str.anim},function (){
+															//alert(4)
+														});
+													}
+												}
+											});
+											layer.close(index);
+											//alert(2)
+										});
+										submit.trigger('click');
+										//alert(3)
+									},
+									// cancel: function (index, layero) {//取消事件
+									// },
+									end: function (index, layero){//弹出窗关闭事件，不论确定或取消
+										location.href="/index";
+									},
+									success: function (layero, index) {
+									}
+								});
+							})
+						}
+						if(data == 0){
+							alert("发生错误！")
+						}
+					},
+					error: function (){
+						alert("网络连接错误！");
+					}
+				})
+			}
+		})
+	})
+</script>
+	</body>
+</html>

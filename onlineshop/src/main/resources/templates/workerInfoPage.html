@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+    <script type="text/html" id="indexTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+</head>
+<body class="layui-layout-body">
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-card-body" style="padding: 15px;">
+                <form class="layui-form layui-form-pane" action="">
+                    <input name="id" th:value="${obj?.id}" class="layui-input layui-hide">
+                    <!--name="*"和{obj?.*}应当与entity中定义的相同-->
+                    <!--如何结合数据库实现ID自增？-->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">用户账号(手机号)</label>
+                        <div class="layui-input-block">
+<!--                            <input type="text" readonly="readonly" name="needid" th:value="${obj?.needid}"  placeholder="" autocomplete="off" class="layui-input">-->
+                            <input type="text" name="needid" th:value="${obj?.id}" readonly="readonly" placeholder="自动输入" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">用户名称</label>
+                        <div class="layui-input-block">
+<!--                            lay-verify="required":必填项-->
+                            <input type="text" name="name" th:value="${obj?.name}" lay-verify="required" placeholder="不超过10个字" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">部门</label>
+                        <div class="layui-input-block">
+                            <select name="department" id="department" lay-filter="department">
+                                <option value="技术部" th:selected="${obj?.department eq '技术部'}">技术部</option>
+                                <option value="销售部" th:selected="${obj?.department eq '销售部'}">销售部</option>
+                                <option value="采购部" th:selected="${obj?.department eq '采购部'}">采购部</option>
+                                <option value="仓储部" th:selected="${obj?.department eq '仓储部'}">仓储部</option>
+                                <option value="物流部" th:selected="${obj?.department eq '物流部'}">物流部</option>
+                                <option value="人事部" th:selected="${obj?.department eq '人事部'}">人事部</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">职位</label>
+                        <div class="layui-input-block">
+                            <select name="job" id="job">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item layui-hide">
+                        <input type="button" lay-submit lay-filter="LAY-front-submit" id="LAY-front-submit" value="确认">
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/static/layui/layui.js}"></script>
+    <script>
+        layui.use(['form'],function () {
+            var $ = layui.$;
+            var form = layui.form;
+            //当前职位
+            var currentJob = '[[${obj?.job}]]';
+            var currentDepartment = '[[${obj?.job}]]'
+            //获取职位列表
+            $.ajax({
+                url: '/job/jobList',
+                dataType: 'json',
+                type: 'GET',
+                cache: false,
+                success: function (data) {
+                    $('#job').prepend("<option value=''>请选择</option>");
+                    for (var i = 0; i < data.data.length; i++) {
+                        if (currentJob == data.data[i].id) {
+                            $('#job').append("<option selected value='" + data.data[i].id + "'>" + data.data[i].name + "</option>");
+                        } else if(currentDepartment == data.data[i].department){
+                            $('#job').append("<option value='" + data.data[i].id + "'>" + data.data[i].name + "</option>");
+                        }
+                    }
+                    form.render();
+                }
+            });
+            form.on('select(department)', function(data){
+                var departmentName = data.value; // departmentName 选中的部门名称
+                $.ajax({
+                    url: '/job/jobList',
+                    dataType: 'json',
+                    type: 'GET',
+                    cache: false,
+                    success: function (data) {
+                        $("#job").empty();//清除原有选项
+                        for (var i = 0; i < data.data.length; i++) {
+                            if(departmentName == data.data[i].department){
+                                $('#job').append("<option value='" + data.data[i].id + "'>" + data.data[i].name + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

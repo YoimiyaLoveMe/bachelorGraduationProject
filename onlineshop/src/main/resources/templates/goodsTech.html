@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>商品一览表</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <!--序号自增-->
+    <script type="text/html" id="indexTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+
+    <!--外部js-->
+<!--    <script type="text/javascript" src=""></script>-->
+
+</head>
+<body class="layui-layout-body">
+    <div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+
+                    <div class="layui-card-header">当前商品类:
+                        <select name="goodsclass" id="goodsclass">
+                            <option value="goods_motherboard">主板</option>
+                            <option value="goods_cpu">芯片</option>
+                            <option value="goods_graphics_card">显卡</option>
+                            <option value="goods_ram">内存</option>
+                            <option value="goods_ssd">硬盘</option>
+                            <option value="goods_heatsink">散热器</option>
+                            <option value="goods_power">电源</option>
+                            <option value="goods_case">机箱</option>
+                        </select>
+                    </div>
+
+                    <div class="layui-card-body">
+                        <table class="layui-hide" id="main-table" lay-filter="main-table"></table>
+                        <script type="text/html" id="toolbarDemo">
+                            <!--添加-->
+                            <span class="layui-inline" lay-event="add"><i class="layui-icon">&#xe654;</i> </span>
+                            <!--查询-->
+                            <span class="layui-inline" style="width: 240px;">
+                                <input class="layui-input" name="param" id="param" placeholder="商品名称查询" autocomplete="off">
+                            </span>
+                            <span class="layui-btn layui-btn-sm layui-bg-red" lay-event="querySearch">
+                                <i class="layui-icon">&#xe615;</i>查询
+                            </span>
+                        </script>
+                        <script type="text/html" id="barDemo">
+                            <a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>
+                            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                        </script>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/static/layui/layui.js}"></script>
+    <!--初始表为主板-->
+    <script>window.onload=function(){motherboard();}</script>
+    <script>
+        <!--选项改动时执行函数-->
+        $("#goodsclass").change(function(){
+            switch ($("#goodsclass").val()){
+                case 'goods_motherboard':
+                    motherboard();
+                    break;
+                case 'goods_cpu':
+                    cpu();
+                    break;
+                case 'goods_graphics_card':
+                    graphicscard();
+                    break;
+                case 'goods_ram':
+                    ram();
+                    break;
+                case 'goods_ssd':
+                    ssd();
+                    break;
+                case 'goods_heatsink':
+                    heatsink();
+                    break;
+                case 'goods_power':
+                    power();
+                    break;
+                case 'goods_case':
+                    thecase();
+                    break;
+            }
+            // table.reload('table-load', {/*刷新当前页面,绿色为当前页面表格id*/
+            //     where: {
+            //         param: param
+            //     }
+            // });
+            // $('#param').val(param);/*重现查询内容，防止与页面一同刷新*/
+        });
+    </script>
+
+    <!------------------------------------------------------------------------------------------------------------------主板-->
+    <script>
+        function motherboard(){
+            layui.use(['table','form'],function () {
+                var $ = layui.$;
+                var table = layui.table;
+                var page = layui.laypage;
+                //定义当前页面表格
+                table.render({
+                    elem: '#main-table',
+                    height: 600,
+                    url: '/goodsTech/motherboardQueryPage',
+                    method: 'POST',
+                    page: true,
+                    id: 'table-load',
+                    toolbar: '#toolbarDemo',
+                    cols: [
+                        [
+                            //field应与entity中定义的一致
+                            //align:'center' 内容居中
+                            //sort: true 开启排序
+                            {field: 'id', title: '商品ID', align: 'center',sort: true,width: '6%'},
+                            {field: 'name', title: '名称', align: 'center'},
+                            {field: 'brand', title: '品牌', align: 'center'},
+                            {field: 'chipset', title: '主芯片组', align: 'center'},
+                            {field: 'cpuSlot', title: 'cpu插槽', align: 'center'},
+                            {field: 'boardType', title: '板型', align: 'center'},
+                            {field: 'memoryType', title: '内存类型', align: 'center'},
+                            {field: 'memoryVolume', title: '最大内存容量（GB）', align: 'center',sort: true},
+                            {field: 'pciE', title: 'PCI-E标准', align: 'center',sort: true},
+                            {field: 'storageInterface', title: '存储接口', align: 'center'},
+                            {field: 'powerInterface', title: '供电接口', align: 'center'},
+                            {field: 'cpuPowerInterface', title: 'cpu辅助供电接口', align: 'center'},
+                            {field: 'isWifi', title: '支持wifi', align: 'center',
+                                templet:function(line){
+                                    if(line.isWifi == 1){
+                                        return '支持';
+                                    }else if(line.isWifi == 0){
+                                        return '不支持';
+                                    }
+                                }},
+                            {field: 'isSuper', title: '支持超频', align: 'center',
+                                templet:function(line){
+                                    if(line.isSuper == 1){
+                                        return '支持';
+                                    }else if(line.isSuper == 0){
+                                        return '不支持';
+                                    }
+                                }},
+                            {title: '操作', align: 'center', toolbar: '#barDemo', fixed: 'right',width: '7%'},//fixed:'right':靠右顶格
+                        ]
+                    ]
+                });
+                // 监听头工具栏事件（添加，查询）
+                table.on('toolbar(main-table)', function (obj) {
+                    switch (obj.event) {
+
+                        //添加
+                        case 'add':
+                            layer.open({
+                                type: 2,
+                                title: '新增硬件',
+                                content: '/goodsTech/motherboardPage',//指向页面地址
+                                shade: [0.8, '#393d49'],//透明度
+                                area: ['600px', '650px'],//弹出窗尺寸（W*L）
+                                btn: ['提交', '取消'],
+                                yes: function (index, layero) {
+                                    var iframeWindow = window['layui-layer-iframe' + index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //contents()的作用？
+                                    //find获取iframe子页面
+                                    //contents获得匹配元素集合中每个元素的子节点，包括文本和注释节点
+                                    //find id为"LAY-front-submit"的子元素
+
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)', function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsTech/getGoodsId',
+                                            dataType: 'json',
+                                            type: 'GET',
+                                            async: false,
+                                            cache: false,
+                                            success: function (data) {
+                                                field.id = data;
+                                                $.ajax({
+                                                    url: '/goodsTech/motherboardAdd',
+                                                    data: field,
+                                                    async: false,//提交等待,是否异步
+                                                    cache: false,//缓存
+                                                    success: function (str) {
+                                                        if (str.code === 0) {
+                                                            table.reload('table-load');
+                                                        }
+                                                        layer.msg(str.msg, {icon: str.icon, anim: str.anim});
+                                                    }
+                                                });
+
+                                            }
+                                        });
+                                        layer.close(index);//关闭弹窗
+                                    });
+                                    submit.trigger('click');//触发该元素点击事件
+                                },
+                                success: function (layero, index) {
+                                }
+                            });
+                            break;
+
+                        //查询
+                        case 'querySearch':
+                            var param = $('#param').val();
+                            table.reload('table-load', {/*刷新当前页面,绿色为当前页面表格id*/
+                                where: {
+                                    param: param
+                                }
+                            });
+                            $('#param').val(param);/*重现查询内容，防止与页面一同刷新*/
+                            break;
+                    }
+                });
+                // //监听修改和删除功能
+                table.on('tool(main-table)',function (obj) {
+                    var data = obj.data;
+                    switch (obj.event) {
+                        case 'edit':
+                            layer.open({
+                                type: 2,
+                                title: '修改主板信息',
+                                content: '/goodsTech/motherboardQueryById?id=' +data.id,
+                                shade:[0.8,'#393d49'],
+                                area:['600px','650px'],
+                                btn:['确定','取消'],
+                                yes:function (index,layero) {
+                                    var iframeWindow = window['layui-layer-iframe'+index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)',function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsTech/motherboardEdit',
+                                            data: field,
+                                            async: false,
+                                            cache: false,
+                                            success: function (str) {
+                                                if(str.code === 0){
+                                                    table.reload('table-load');
+                                                }
+                                                layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                            }
+                                        });
+                                        layer.close(index);     //关闭弹层
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success:function (layero,index) {
+
+                                }
+                            });
+                            break;
+                        case 'del':
+                            layer.confirm('确认删除？',function (index) {
+                                $.ajax({
+                                    url: '/goodsTech/motherboardDelById?board_id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+                    }
+                });
+            });
+        }
+    </script>
+
+    <!------------------------------------------------------------------------------------------------------------------芯片-->
+    <script>
+        function cpu(){
+            layui.use(['table','form'],function () {
+                var $ = layui.$;
+                var table = layui.table;
+                table.render({
+                    elem: '#main-table',
+                    height: 600,
+                    url: '/goodsTech/cpuQueryPage',
+                    method: 'POST',
+                    page: true,
+                    id: 'table-load',
+                    toolbar: '#toolbarDemo',
+                    cols: [
+                        [
+                            {field: 'id', title: '商品ID', align: 'center',sort: true,width: '6%'},
+                            {field: 'name', title: '名称', align: 'center'},
+                            {field: 'brand', title: '品牌', align: 'center'},
+                            {field: 'series', title: '系列', align: 'center'},
+                            {field: 'coreNumber', title: '核心数量', align: 'center',sort: true},
+                            {field: 'threadNumber', title: '线程数量', align: 'center',sort: true},
+                            {field: 'slot', title: '插槽类型', align: 'center'},
+                            {field: 'accuracy', title: '制作工艺', align: 'center',sort: true},
+                            {field: 'coreCord', title: '核心代号', align: 'center'},
+                            {field: 'structure', title: 'cpu架构', align: 'center'},
+                            {field: 'basicFrequency', title: '主频(GHz)', align: 'center',sort: true},
+                            {field: 'turbo', title: '最高睿频(GHz)', align: 'center',sort: true},
+                            {field: 'tdp', title: 'TDP(W)', align: 'center',sort: true},
+                            {field: 'mtp', title: 'MTP(W)', align: 'center',sort: true},
+                            {field: 'memoryVolume', title: '支持最大内存(GB)', align: 'center',sort: true},
+                            {field: 'memoryType', title: '内存类型', align: 'center'},
+                            {field: 'memoryChannel', title: '最大内存通道数', align: 'center',sort: true},
+                            {field: 'pciE', title: 'PCI-E标准', align: 'center',sort: true},
+                            {field: 'integratedCpu', title: '集成显卡', align: 'center',
+                                templet:function(line){
+                                    if(line.integratedCpu == null){
+                                        return '无';
+                                    }else {
+                                        return line.integratedCpu;
+                                    }
+                                }},
+                            {field: 'performance', title: '性能跑分', align: 'center',sort: true},
+                            {title: '操作', align: 'center', toolbar: '#barDemo', fixed: 'right',width: '7%'},
+                        ]
+                    ]
+                });
+                // 监听头工具栏事件（添加，查询）
+                table.on('toolbar(main-table)', function (obj) {
+                    switch (obj.event) {
+
+                        //添加
+                        case 'add':
+                            layer.open({
+                                type: 2,
+                                title: '新增硬件',
+                                content: '/goodsTech/cpuPage',
+                                shade: [0.8, '#393d49'],
+                                area: ['600px', '650px'],
+                                btn: ['提交', '取消'],
+                                yes: function (index, layero) {
+                                    var iframeWindow = window['layui-layer-iframe' + index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)', function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsTech/getGoodsId',
+                                            dataType: 'json',
+                                            type: 'GET',
+                                            async: false,
+                                            cache: false,
+                                            success: function (data) {
+                                                field.id = data;
+                                                $.ajax({
+                                                    url: '/goodsTech/cpuAdd',
+                                                    data: field,
+                                                    async: false,//提交等待,是否异步
+                                                    cache: false,//缓存
+                                                    success: function (str) {
+                                                        if (str.code === 0) {
+                                                            table.reload('table-load');
+                                                        }
+                                                        layer.msg(str.msg, {icon: str.icon, anim: str.anim});
+                                                    }
+                                                });
+
+                                            }
+                                        });
+                                        layer.close(index);
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success: function (layero, index) {
+                                }
+                            });
+                            break;
+
+                        //查询
+                        case 'querySearch':
+                            var param = $('#param').val();
+                            table.reload('table-load', {
+                                where: {
+                                    param: param
+                                }
+                            });
+                            $('#param').val(param);
+                            break;
+                    }
+                });
+                // //监听修改和删除功能
+                table.on('tool(main-table)',function (obj) {
+                    var data = obj.data;
+                    switch (obj.event) {
+                        case 'edit':
+                            layer.open({
+                                type: 2,
+                                title: '修改芯片信息',
+                                content: '/goodsTech/cpuQueryById?id=' +data.id,
+                                shade:[0.8,'#393d49'],
+                                area:['600px','650px'],
+                                btn:['确定','取消'],
+                                yes:function (index,layero) {
+                                    var iframeWindow = window['layui-layer-iframe'+index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)',function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsTech/cpuEdit',
+                                            data: field,
+                                            async: false,
+                                            cache: false,
+                                            success: function (str) {
+                                                if(str.code === 0){
+                                                    table.reload('table-load');
+                                                }
+                                                layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                            }
+                                        });
+                                        layer.close(index);
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success:function (layero,index) {
+
+                                }
+                            });
+                            break;
+                        case 'del':
+                            layer.confirm('确认删除？',function (index) {
+                                $.ajax({
+                                    url: '/goodsTech/cpuDelById?cpu_id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+                    }
+                });
+            });
+        }
+    </script>
+
+    <!------------------------------------------------------------------------------------------------------------------显卡-->
+
+    <script>
+        function graphicscard(){
+            layui.use(['table','form'],function () {
+                var $ = layui.$;
+                var table = layui.table;
+                var page = layui.laypage;
+                //定义当前页面表格
+                table.render({
+                    elem: '#main-table',
+                    height: 600,
+                    url: '/goodsTech/graphicscardQueryPage',
+                    method: 'POST',
+                    page: true,
+                    id: 'table-load',
+                    toolbar: '#toolbarDemo',
+                    cols: [
+                        [
+                            //field应与entity中定义的一致
+                            //align:'center' 内容居中
+                            //sort: true 开启排序
+                            {field: 'id', title: '商品ID', align: 'center',sort: true,width: '6%'},
+                            {field: 'name', title: '名称', align: 'center'},
+                            {field: 'brand', title: '品牌', align: 'center'},
+                            {field: 'core', title: '显卡芯片', align: 'center'},
+                            {field: 'coreFirm', title: '显卡芯片厂商', align: 'center'},
+                            {field: 'coreSeries', title: '显卡芯片系列', align: 'center'},
+                            {field: 'ramType', title: '显存类型', align: 'center'},
+                            {field: 'ramVolume', title: '显存容量（GB）', align: 'center',sort: true},
+                            {field: 'ramBit', title: '显存位宽（bit）', align: 'center',sort: true},
+                            {field: 'io', title: 'IO接口', align: 'center'},
+                            {field: 'accuracy', title: '制作工艺（num）', align: 'center',sort: true},
+                            {field: 'resolution', title: '支持最大分辨率', align: 'center'},
+                            {field: 'pciE', title: 'PCI-E标准', align: 'center',sort: true},
+                            {field: 'powerWaste', title: '功耗（W）', align: 'center',sort: true},
+                            {field: 'powerInterface', title: '供电接口', align: 'center'},
+                            {field: 'size', title: '长度(mm)', align: 'center',sort: true},
+                            {field: 'performance', title: '性能跑分', align: 'center',sort: true},
+                            {title: '操作', align: 'center', toolbar: '#barDemo', fixed: 'right',width: '7%'},//fixed:'right':靠右顶格
+                        ]
+                    ]
+                });
+                // 监听头工具栏事件（添加，查询）
+                table.on('toolbar(main-table)', function (obj) {
+                    switch (obj.event) {
+
+                        //添加
+                        case 'add':
+                            layer.open({
+                                type: 2,
+                                title: '新增硬件',
+                                content: '/goodsTech/graphicscardPage',//指向页面地址
+                                shade: [0.8, '#393d49'],//透明度
+                                area: ['600px', '650px'],
+                                btn: ['提交', '取消'],
+                                yes: function (index, layero) {
+                                    var iframeWindow = window['layui-layer-iframe' + index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)', function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsTech/getGoodsId',
+                                            dataType: 'json',
+                                            type: 'GET',
+                                            async: false,
+                                            cache: false,
+                                            success: function (data) {
+                                                field.id = data;
+                                                $.ajax({
+                                                    url: '/goodsTech/graphicscardAdd',
+                                                    data: field,
+                                                    async: false,//提交等待,是否异步
+                                                    cache: false,//缓存
+                                                    success: function (str) {
+                                                        if (str.code === 0) {
+                                                            table.reload('table-load');
+                                                        }
+                                                        layer.msg(str.msg, {icon: str.icon, anim: str.anim});
+                                                    }
+                                                });
+
+                                            }
+                                        });
+                                        layer.close(index);//关闭弹窗
+                                    });
+                                    submit.trigger('click');//触发该元素点击事件
+                                },
+                                success: function (layero, index) {
+                                }
+                            });
+                            break;
+
+                        //查询
+                        case 'querySearch':
+                            var param = $('#param').val();
+                            table.reload('table-load', {/*刷新当前页面,绿色为当前页面表格id*/
+                                where: {
+                                    param: param
+                                }
+                            });
+                            $('#param').val(param);/*重现查询内容，防止与页面一同刷新*/
+                            break;
+                    }
+                });
+                // //监听修改和删除功能
+                table.on('tool(main-table)',function (obj) {
+                    var data = obj.data;
+                    switch (obj.event) {
+                        case 'edit':
+                            layer.open({
+                                type: 2,
+                                title: '修改显卡信息',
+                                content: '/goodsTech/graphicscardQueryById?id=' +data.id,
+                                shade:[0.8,'#393d49'],
+                                area:['600px','650px'],
+                                btn:['确定','取消'],
+                                yes:function (index,layero) {
+                                    var iframeWindow = window['layui-layer-iframe'+index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)',function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsTech/graphicscardEdit',
+                                            data: field,
+                                            async: false,
+                                            cache: false,
+                                            success: function (str) {
+                                                if(str.code === 0){
+                                                    table.reload('table-load');
+                                                }
+                                                layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                            }
+                                        });
+                                        layer.close(index);     //关闭弹层
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success:function (layero,index) {
+
+                                }
+                            });
+                            break;
+                        case 'del':
+                            layer.confirm('确认删除？',function (index) {
+                                $.ajax({
+                                    url: '/goodsTech/graphicscardDelById?graphicscard_id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+                    }
+                });
+            });
+        }
+    </script>
+
+    <!------------------------------------------------------------------------------------------------------------------内存-->
+    <script>
+        function ram(){
+            layui.use(['table','form'],function () {
+                var $ = layui.$;
+                var table = layui.table;
+                //定义当前页面表格
+                table.render({
+                    elem: '#main-table',
+                    height: 600,
+                    url: '/goodsTech/ramQueryPage',
+                    method: 'POST',
+                    page: true,
+                    id: 'table-load',
+                    toolbar: '#toolbarDemo',
+                    cols: [
+                        [
+                            {field: 'id', title: '商品ID', align: 'center',sort: true,width: '6%'},
+                            {field: 'name', title: '名称', align: 'center'},
+                            {field: 'brand', title: '品牌', align: 'center'},
+                            {field: 'volume', title: '单条容量(GB)', align: 'center',sort: true},
+                            {field: 'type', title: '内存类型', align: 'center'},
+                            {field: 'frequency', title: '频率', align: 'center',sort: true},
+                            {field: 'slot', title: '插槽', align: 'center'},
+                            {field: 'pack', title: '套装', align: 'center',sort: true},
+                            {field: 'performance', title: '性能跑分', align: 'center',sort: true},
+                            {title: '操作', align: 'center', toolbar: '#barDemo', fixed: 'right',width: '7%'},
+                        ]
+                    ]
+                });
+                // 监听头工具栏事件（添加，查询）
+                table.on('toolbar(main-table)', function (obj) {
+                    switch (obj.event) {
+
+                        //添加
+                        case 'add':
+                            layer.open({
+                                type: 2,
+                                title: '新增硬件',
+                                content: '/goodsTech/ramPage',
+                                shade: [0.8, '#393d49'],
+                                area: ['600px', '650px'],
+                                btn: ['提交', '取消'],
+                                yes: function (index, layero) {
+                                    var iframeWindow = window['layui-layer-iframe' + index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)', function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsTech/getGoodsId',
+                                            dataType: 'json',
+                                            type: 'GET',
+                                            async: false,
+                                            cache: false,
+                                            success: function (data) {
+                                                field.id = data;
+                                                $.ajax({
+                                                    url: '/goodsTech/ramAdd',
+                                                    data: field,
+                                                    async: false,//提交等待,是否异步
+                                                    cache: false,//缓存
+                                                    success: function (str) {
+                                                        if (str.code === 0) {
+                                                            table.reload('table-load');
+                                                        }
+                                                        layer.msg(str.msg, {icon: str.icon, anim: str.anim});
+                                                    }
+                                                });
+
+                                            }
+                                        });
+                                        layer.close(index);
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success: function (layero, index) {
+                                }
+                            });
+                            break;
+
+                        //查询
+                        case 'querySearch':
+                            var param = $('#param').val();
+                            table.reload('table-load', {
+                                where: {
+                                    param: param
+                                }
+                            });
+                            $('#param').val(param);
+                            break;
+                    }
+                });
+                // //监听修改和删除功能
+                table.on('tool(main-table)',function (obj) {
+                    var data = obj.data;
+                    switch (obj.event) {
+                        case 'edit':
+                            layer.open({
+                                type: 2,
+                                title: '修改散热器信息',
+                                content: '/goodsTech/ramQueryById?id=' +data.id,
+                                shade:[0.8,'#393d49'],
+                                area:['600px','650px'],
+                                btn:['确定','取消'],
+                                yes:function (index,layero) {
+                                    var iframeWindow = window['layui-layer-iframe'+index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)',function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsTech/ramEdit',
+                                            data: field,
+                                            async: false,
+                                            cache: false,
+                                            success: function (str) {
+                                                if(str.code === 0){
+                                                    table.reload('table-load');
+                                                }
+                                                layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                            }
+                                        });
+                                        layer.close(index);
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success:function (layero,index) {
+
+                                }
+                            });
+                            break;
+                        case 'del':
+                            layer.confirm('确认删除？',function (index) {
+                                $.ajax({
+                                    url: '/goodsTech/ramDelById?ram_id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+                    }
+                });
+            });
+        }
+    </script>
+
+    <!------------------------------------------------------------------------------------------------------------------固态硬盘-->
+    
+    <script>
+        function ssd(){
+            layui.use(['table','form'],function () {
+                var $ = layui.$;
+                var table = layui.table;
+                //定义当前页面表格
+                table.render({
+                    elem: '#main-table',
+                    height: 600,
+                    url: '/goodsTech/ssdQueryPage',
+                    method: 'POST',
+                    page: true,
+                    id: 'table-load',
+                    toolbar: '#toolbarDemo',
+                    cols: [
+                        [
+                            {field: 'id', title: '商品ID', align: 'center',sort: true,width: '6%'},
+                            {field: 'name', title: '名称', align: 'center'},
+                            {field: 'brand', title: '品牌', align: 'center'},
+                            {field: 'volume', title: '容量', align: 'center',sort: true},
+                            {field: 'slot', title: '接口', align: 'center'},
+                            {field: 'structure', title: '闪存架构', align: 'center'},
+                            {field: 'performance', title: '性能跑分', align: 'center',sort: true},
+                            {title: '操作', align: 'center', toolbar: '#barDemo', fixed: 'right',width: '7%'},
+                        ]
+                    ]
+                });
+                // 监听头工具栏事件（添加，查询）
+                table.on('toolbar(main-table)', function (obj) {
+                    switch (obj.event) {
+
+                        //添加
+                        case 'add':
+                            layer.open({
+                                type: 2,
+                                title: '新增硬件',
+                                content: '/goodsTech/ssdPage',
+                                shade: [0.8, '#393d49'],
+                                area: ['600px', '650px'],
+                                btn: ['提交', '取消'],
+                                yes: function (index, layero) {
+                                    var iframeWindow = window['layui-layer-iframe' + index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)', function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsTech/getGoodsId',
+                                            dataType: 'json',
+                                            type: 'GET',
+                                            async: false,
+                                            cache: false,
+                                            success: function (data) {
+                                                field.id = data;
+                                                $.ajax({
+                                                    url: '/goodsTech/ssdAdd',
+                                                    data: field,
+                                                    async: false,//提交等待,是否异步
+                                                    cache: false,//缓存
+                                                    success: function (str) {
+                                                        if (str.code === 0) {
+                                                            table.reload('table-load');
+                                                        }
+                                                        layer.msg(str.msg, {icon: str.icon, anim: str.anim});
+                                                    }
+                                                });
+
+                                            }
+                                        });
+                                        layer.close(index);
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success: function (layero, index) {
+                                }
+                            });
+                            break;
+
+                        //查询
+                        case 'querySearch':
+                            var param = $('#param').val();
+                            table.reload('table-load', {
+                                where: {
+                                    param: param
+                                }
+                            });
+                            $('#param').val(param);
+                            break;
+                    }
+                });
+                // //监听修改和删除功能
+                table.on('tool(main-table)',function (obj) {
+                    var data = obj.data;
+                    switch (obj.event) {
+                        case 'edit':
+                            layer.open({
+                                type: 2,
+                                title: '修改散热器信息',
+                                content: '/goodsTech/ssdQueryById?id=' +data.id,
+                                shade:[0.8,'#393d49'],
+                                area:['600px','650px'],
+                                btn:['确定','取消'],
+                                yes:function (index,layero) {
+                                    var iframeWindow = window['layui-layer-iframe'+index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)',function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsTech/ssdEdit',
+                                            data: field,
+                                            async: false,
+                                            cache: false,
+                                            success: function (str) {
+                                                if(str.code === 0){
+                                                    table.reload('table-load');
+                                                }
+                                                layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                            }
+                                        });
+                                        layer.close(index);
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success:function (layero,index) {
+
+                                }
+                            });
+                            break;
+                        case 'del':
+                            layer.confirm('确认删除？',function (index) {
+                                $.ajax({
+                                    url: '/goodsTech/ssdDelById?ssd_id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+                    }
+                });
+            });
+        }
+    </script>
+
+    <!------------------------------------------------------------------------------------------------------------------散热器-->
+    <script>
+        function heatsink(){
+            layui.use(['table','form'],function () {
+                var $ = layui.$;
+                var table = layui.table;
+                //定义当前页面表格
+                table.render({
+                    elem: '#main-table',
+                    height: 600,
+                    url: '/goodsTech/heatsinkQueryPage',
+                    method: 'POST',
+                    page: true,
+                    id: 'table-load',
+                    toolbar: '#toolbarDemo',
+                    cols: [
+                        [
+                            {field: 'id', title: '商品ID', align: 'center',sort: true,width: '6%'},
+                            {field: 'name', title: '名称', align: 'center'},
+                            {field: 'brand', title: '品牌', align: 'center'},
+                            {field: 'cfm', title: '最大风量(CFM)', align: 'center',sort: true},
+                            {field: 'size', title: '尺寸', align: 'center'},
+                            {title: '操作', align: 'center', toolbar: '#barDemo', fixed: 'right',width: '7%'},
+                        ]
+                    ]
+                });
+                // 监听头工具栏事件（添加，查询）
+                table.on('toolbar(main-table)', function (obj) {
+                    switch (obj.event) {
+
+                        //添加
+                        case 'add':
+                            layer.open({
+                                type: 2,
+                                title: '新增硬件',
+                                content: '/goodsTech/heatsinkPage',
+                                shade: [0.8, '#393d49'],
+                                area: ['600px', '650px'],
+                                btn: ['提交', '取消'],
+                                yes: function (index, layero) {
+                                    var iframeWindow = window['layui-layer-iframe' + index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)', function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsTech/getGoodsId',
+                                            dataType: 'json',
+                                            type: 'GET',
+                                            async: false,
+                                            cache: false,
+                                            success: function (data) {
+                                                field.id = data;
+                                                $.ajax({
+                                                    url: '/goodsTech/heatsinkAdd',
+                                                    data: field,
+                                                    async: false,//提交等待,是否异步
+                                                    cache: false,//缓存
+                                                    success: function (str) {
+                                                        if (str.code === 0) {
+                                                            table.reload('table-load');
+                                                        }
+                                                        layer.msg(str.msg, {icon: str.icon, anim: str.anim});
+                                                    }
+                                                });
+
+                                            }
+                                        });
+                                        layer.close(index);
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success: function (layero, index) {
+                                }
+                            });
+                            break;
+
+                        //查询
+                        case 'querySearch':
+                            var param = $('#param').val();
+                            table.reload('table-load', {
+                                where: {
+                                    param: param
+                                }
+                            });
+                            $('#param').val(param);
+                            break;
+                    }
+                });
+                // //监听修改和删除功能
+                table.on('tool(main-table)',function (obj) {
+                    var data = obj.data;
+                    switch (obj.event) {
+                        case 'edit':
+                            layer.open({
+                                type: 2,
+                                title: '修改散热器信息',
+                                content: '/goodsTech/heatsinkQueryById?id=' +data.id,
+                                shade:[0.8,'#393d49'],
+                                area:['600px','650px'],
+                                btn:['确定','取消'],
+                                yes:function (index,layero) {
+                                    var iframeWindow = window['layui-layer-iframe'+index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)',function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsTech/heatsinkEdit',
+                                            data: field,
+                                            async: false,
+                                            cache: false,
+                                            success: function (str) {
+                                                if(str.code === 0){
+                                                    table.reload('table-load');
+                                                }
+                                                layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                            }
+                                        });
+                                        layer.close(index);
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success:function (layero,index) {
+
+                                }
+                            });
+                            break;
+                        case 'del':
+                            layer.confirm('确认删除？',function (index) {
+                                $.ajax({
+                                    url: '/goodsTech/heatsinkDelById?heatsink_id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+                    }
+                });
+            });
+        }
+    </script>
+
+    <!------------------------------------------------------------------------------------------------------------------电源-->
+    
+    <script>
+        function power(){
+            layui.use(['table','form'],function () {
+                var $ = layui.$;
+                var table = layui.table;
+                //定义当前页面表格
+                table.render({
+                    elem: '#main-table',
+                    height: 600,
+                    url: '/goodsTech/powerQueryPage',
+                    method: 'POST',
+                    page: true,
+                    id: 'table-load',
+                    toolbar: '#toolbarDemo',
+                    cols: [
+                        [
+                            {field: 'id', title: '商品ID', align: 'center',sort: true,width: '6%'},
+                            {field: 'name', title: '名称', align: 'center'},
+                            {field: 'brand', title: '品牌', align: 'center'},
+                            {field: 'ratedPower', title: '额定功率', align: 'center',sort: true},
+                            {field: 'grade80plus', title: '80plus认证', align: 'center'},
+                            {field: 'gcInterNumber', title: '显卡接口数量', align: 'center',sort: true},
+                            {field: 'ssdInterNumber', title: '硬盘接口数量', align: 'center',sort: true},
+                            {field: 'otInterNumber', title: '其它输出接口数量', align: 'center',sort: true},
+                            {field: 'module', title: '模组电源', align: 'center'},
+                            {field: 'size', title: '尺寸', align: 'center'},
+                            {title: '操作', align: 'center', toolbar: '#barDemo', fixed: 'right',width: '7%'},
+                        ]
+                    ]
+                });
+                // 监听头工具栏事件（添加，查询）
+                table.on('toolbar(main-table)', function (obj) {
+                    switch (obj.event) {
+
+                        //添加
+                        case 'add':
+                            layer.open({
+                                type: 2,
+                                title: '新增硬件',
+                                content: '/goodsTech/powerPage',
+                                shade: [0.8, '#393d49'],
+                                area: ['600px', '650px'],
+                                btn: ['提交', '取消'],
+                                yes: function (index, layero) {
+                                    var iframeWindow = window['layui-layer-iframe' + index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)', function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsTech/getGoodsId',
+                                            dataType: 'json',
+                                            type: 'GET',
+                                            async: false,
+                                            cache: false,
+                                            success: function (data) {
+                                                field.id = data;
+                                                $.ajax({
+                                                    url: '/goodsTech/powerAdd',
+                                                    data: field,
+                                                    async: false,//提交等待,是否异步
+                                                    cache: false,//缓存
+                                                    success: function (str) {
+                                                        if (str.code === 0) {
+                                                            table.reload('table-load');
+                                                        }
+                                                        layer.msg(str.msg, {icon: str.icon, anim: str.anim});
+                                                    }
+                                                });
+
+                                            }
+                                        });
+                                        layer.close(index);
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success: function (layero, index) {
+                                }
+                            });
+                            break;
+
+                        //查询
+                        case 'querySearch':
+                            var param = $('#param').val();
+                            table.reload('table-load', {
+                                where: {
+                                    param: param
+                                }
+                            });
+                            $('#param').val(param);
+                            break;
+                    }
+                });
+                // //监听修改和删除功能
+                table.on('tool(main-table)',function (obj) {
+                    var data = obj.data;
+                    switch (obj.event) {
+                        case 'edit':
+                            layer.open({
+                                type: 2,
+                                title: '修改散热器信息',
+                                content: '/goodsTech/powerQueryById?id=' +data.id,
+                                shade:[0.8,'#393d49'],
+                                area:['600px','650px'],
+                                btn:['确定','取消'],
+                                yes:function (index,layero) {
+                                    var iframeWindow = window['layui-layer-iframe'+index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)',function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsTech/powerEdit',
+                                            data: field,
+                                            async: false,
+                                            cache: false,
+                                            success: function (str) {
+                                                if(str.code === 0){
+                                                    table.reload('table-load');
+                                                }
+                                                layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                            }
+                                        });
+                                        layer.close(index);
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success:function (layero,index) {
+
+                                }
+                            });
+                            break;
+                        case 'del':
+                            layer.confirm('确认删除？',function (index) {
+                                $.ajax({
+                                    url: '/goodsTech/powerDelById?power_id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+                    }
+                });
+            });
+        }
+    </script>
+
+    <!------------------------------------------------------------------------------------------------------------------机箱-->
+    <script>
+        function thecase(){
+            layui.use(['table','form'],function () {
+                var $ = layui.$;
+                var table = layui.table;
+                //定义当前页面表格
+                table.render({
+                    elem: '#main-table',
+                    height: 600,
+                    url: '/goodsTech/caseQueryPage',
+                    method: 'POST',
+                    page: true,
+                    id: 'table-load',
+                    toolbar: '#toolbarDemo',
+                    cols: [
+                        [
+                            {field: 'id', title: '商品ID', align: 'center',sort: true,width: '6%'},
+                            {field: 'name', title: '名称', align: 'center'},
+                            {field: 'brand', title: '品牌', align: 'center'},
+                            {field: 'size', title: '尺寸', align: 'center'},
+                            {field: 'structure', title: '结构', align: 'center'},
+                            {field: 'mbLimit', title: '主板板型限制', align: 'center'},
+                            {field: 'htLimit', title: '散热器限高(mm)', align: 'center',sort: true},
+                            {field: 'gcLimit', title: '显卡限长(mm)', align: 'center',sort: true},
+                            {field: 'pwLimit', title: '电源限制', align: 'center'},
+                            {field: 'pciSlot', title: 'pci插槽数量', align: 'center',sort: true},
+                            {title: '操作', align: 'center', toolbar: '#barDemo', fixed: 'right',width: '7%'},
+                        ]
+                    ]
+                });
+                // 监听头工具栏事件（添加，查询）
+                table.on('toolbar(main-table)', function (obj) {
+                    switch (obj.event) {
+
+                        //添加
+                        case 'add':
+                            layer.open({
+                                type: 2,
+                                title: '新增硬件',
+                                content: '/goodsTech/casePage',
+                                shade: [0.8, '#393d49'],
+                                area: ['600px', '650px'],
+                                btn: ['提交', '取消'],
+                                yes: function (index, layero) {
+                                    var iframeWindow = window['layui-layer-iframe' + index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)', function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsTech/getGoodsId',
+                                            dataType: 'json',
+                                            type: 'GET',
+                                            async: false,
+                                            cache: false,
+                                            success: function (data) {
+                                                field.id = data;
+                                                $.ajax({
+                                                    url: '/goodsTech/caseAdd',
+                                                    data: field,
+                                                    async: false,//提交等待,是否异步
+                                                    cache: false,//缓存
+                                                    success: function (str) {
+                                                        if (str.code === 0) {
+                                                            table.reload('table-load');
+                                                        }
+                                                        layer.msg(str.msg, {icon: str.icon, anim: str.anim});
+                                                    }
+                                                });
+
+                                            }
+                                        });
+                                        layer.close(index);
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success: function (layero, index) {
+                                }
+                            });
+                            break;
+
+                        //查询
+                        case 'querySearch':
+                            var param = $('#param').val();
+                            table.reload('table-load', {
+                                where: {
+                                    param: param
+                                }
+                            });
+                            $('#param').val(param);
+                            break;
+                    }
+                });
+                // //监听修改和删除功能
+                table.on('tool(main-table)',function (obj) {
+                    var data = obj.data;
+                    switch (obj.event) {
+                        case 'edit':
+                            layer.open({
+                                type: 2,
+                                title: '修改机箱信息',
+                                content: '/goodsTech/caseQueryById?id=' +data.id,
+                                shade:[0.8,'#393d49'],
+                                area:['600px','650px'],
+                                btn:['确定','取消'],
+                                yes:function (index,layero) {
+                                    var iframeWindow = window['layui-layer-iframe'+index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)',function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsTech/caseEdit',
+                                            data: field,
+                                            async: false,
+                                            cache: false,
+                                            success: function (str) {
+                                                if(str.code === 0){
+                                                    table.reload('table-load');
+                                                }
+                                                layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                            }
+                                        });
+                                        layer.close(index);
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success:function (layero,index) {
+
+                                }
+                            });
+                            break;
+                        case 'del':
+                            layer.confirm('确认删除？',function (index) {
+                                $.ajax({
+                                    url: '/goodsTech/caseDelById?case_id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

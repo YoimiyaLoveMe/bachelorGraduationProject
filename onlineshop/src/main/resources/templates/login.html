@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
+    <title>登录页面</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+    <link rel="stylesheet"  th:href="@{../static/login/css/login.css}">
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script th:src="@{/static/layui/layui.js}"></script>
+    <script type="text/javascript">
+        $(function(){
+            $('#password').focus(function(){
+                // 密码框获得焦点，追加样式.password
+                $('#owl').addClass('password');
+            }).blur(function(){
+                // 密码框失去焦点，移除样式.password
+                $('#owl').removeClass('password');
+            })
+        })
+    </script>
+</head>
+
+<body>
+    <div class="login-box">
+        <div class="owl" id="owl">
+            <div class="hand"></div>
+            <div class="hand hand-r"></div>
+            <div class="arms">
+                <div class="arm"></div>
+                <div class="arm arm-r"></div>
+            </div>
+        </div>
+        <div class="input-box">
+            <input type="text" placeholder="账号" id="id" lay-verify="required">
+            <input type="password" placeholder="密码" id="password" lay-verify="required">
+            <button onclick="login()">登录</button>
+        </div>
+        <div align="right">
+            <i>Made by wuyishuo</i>
+        </div>
+    </div>
+    <script>
+        function login(){
+            layui.use("form",function(){
+                //登录
+                var form = layui.form;
+                var $ = layui.$;
+                $.ajax({
+                    url: "/toLogin",
+                    type: "POST",
+                    data: {
+                        id: document.getElementById("id").value,
+                        password: document.getElementById("password").value,
+                    } ,
+                    dataType:"json",
+                    success:function (result){
+                        if(result.code == "1"){
+                            layer.msg(result.msg,{icon:result.icon,anim:result.anim},function (){
+                                //成功后转向的页面
+                                location.href="/index";
+                            });
+                        }
+                        else {
+                            layer.msg(result.msg,{icon: result.icon,anim:result.anim});
+                        }
+                    }
+                });
+                return false;
+            });
+        }
+    </script>
+</body>
+
+</html>

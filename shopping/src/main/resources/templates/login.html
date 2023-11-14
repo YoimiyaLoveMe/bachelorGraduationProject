@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- 引入css、js -->
+    <link rel="stylesheet" href="/static/login/css/index.css">
+    <link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+    <script th:src="@{/static/layui/layui.js}"></script>
+    <script src="/static/login/js/index.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+</head>
+<body>
+    <!-- 搭建结构 -->
+    <div class="container switch">
+        <!-- 登录页面 -->
+        <div class="container-form container-signin">
+            <form class="form">
+                <h2 class="form-title">登录</h2>
+                <input type="text" placeholder="账号" name="id" class="input" id="signin-id">
+                <input type="password" placeholder="密码" name="password" class="input" id="signin-password">
+                <a href="#">忘记密码?</a>
+                <button class="submit" type="button" onclick="signin()">登录</button>
+            </form>
+        </div>
+        <!-- 注册页面 -->
+        <div class="container-form container-signup">
+            <form action="" class="form">
+                <h2 class="form-title">注册</h2>
+                <input type="tel" placeholder="账号(推荐使用手机号)" class="input" id="signup-id" oninput="value=value.replace(/[^\d]/g,'')">
+                <input type="text" placeholder="用户名" class="input" id="signup-name">
+                <input type="password" placeholder="密码" class="input" id="signup-password">
+                <button class="submit" type="button" onclick="signup()">注册</button>
+            </form>
+        </div>
+        <!-- 覆盖层 -->
+        <div class="container-overlay">
+            <div class="overlay">
+                <div class="overlay-slide overlay-left">
+                    <button class="submit" id="goSignIn">已有账号，立即登录</button>
+                </div>
+                <div class="overlay-slide overlay-right">
+                    <button class="submit" id="goSignUp">没有账号，进行注册</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<!--错误日志 2022.4.11-->
+<!--ajax请求完全失效，没有进行提交，提交按钮的触发函数正常。-->
+<!--推测：触发提交函数后页面被刷新，导致ajax未向指定url发送数据而是以本页面发送数据，数据实际未被后端接收-->
+<!--问题聚焦至layui的layer未启用，程序错误导致ajax后续代码未执行-->
+
+<script>
+    function signin(){
+        layui.use("form",function(){
+            //登录
+            var form = layui.form;
+            var $ = layui.$;
+            $.ajax({
+                url: "/toLogin",//为后端接口,指发出请求的页面
+                type: "POST",
+                data: {
+                    id: document.getElementById("signin-id").value,
+                    password: document.getElementById("signin-password").value,
+                } ,
+                dataType:"json",
+                success:function (result){
+                    if(result.code == "1"){
+                        layer.msg(result.msg,{icon:result.icon,anim:result.anim},function (){
+                            //成功后转向的页面
+                            location.href="/index";
+                        });
+                    }
+                    else {
+                        layer.msg(result.msg,{icon: result.icon,anim:result.anim});
+                    }
+                }
+            });
+            return false;
+        });
+    }
+</script>
+
+<script>
+    function signup() {
+        layui.use("form", function () {
+            //注册
+            var form = layui.form;
+            var $ = layui.$;
+            $.ajax({
+                url:"/customerAdd",
+                type:"POST",
+                data: {
+                    id: document.getElementById("signup-id").value,
+                    name: document.getElementById("signup-name").value,
+                    password: document.getElementById("signup-password").value,
+                },
+                dataType:"json",
+                async: false,
+                cache: false,
+                success: function (result) {
+                    //注册成功后自动登录
+                    if (result.code == "1") {
+                        layer.msg(result.msg, {icon: result.icon, anim: result.anim}, function () {
+                            $.ajax({
+                                url: "/toLogin",
+                                type: "POST",
+                                data: {
+                                    id: document.getElementById("signup-id").value,
+                                    password: document.getElementById("signup-password").value,
+                                } ,
+                                dataType:"json",
+                                success:function (result){
+                                    if(result.code == "1"){
+                                            location.href="/index";
+                                    }
+                                }
+                            });
+                        });
+                    } else {
+                        layer.msg(result.msg, {icon: result.icon, anim: result.anim});
+                    }
+                }
+            });
+            return false;
+        });
+    }
+</script>
+
+</body>
+</html>
+<!-- 结构搭建完成 -->

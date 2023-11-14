@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>入库</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/html" id="indexTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+</head>
+<body class="layui-layout-body">
+    <div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header"></div>
+                    <div class="layui-card-body">
+                        <table class="layui-hide" id="main-table" lay-filter="main-table"></table>
+                        <script type="text/html" id="toolbarDemo">
+                            <!--添加-->
+                            <span class="layui-inline" lay-event="add"><i class="layui-icon">&#xe654;</i> </span>
+                            <!--查询-->
+                            <span class="layui-inline" style="width: 240px;">
+                                <input class="layui-input" name="param" id="param" placeholder="前置单号查询" autocomplete="off">
+                            </span>
+                            <span class="layui-btn layui-btn-sm layui-bg-red" lay-event="querySearch">
+                                <i class="layui-icon">&#xe615;</i>查询
+                            </span>
+                        </script>
+
+                        <script type="text/html" id="barDemo">
+                            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                        </script>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/static/layui/layui.js}"></script>
+    <script>
+        layui.use(['table','form'],function () {
+            var $ = layui.$;
+            var table = layui.table;
+            //定义当前页面表格
+            table.render({
+                elem: '#main-table',
+                height: 650,
+                url: '/warehouseIn/warehouseInQueryPage',
+                method: 'POST',
+                page: true,
+                id: 'table-load',
+                toolbar: '#toolbarDemo',
+                cols: [
+                    [
+                        {field: 'id', title: '入库编号', align: 'center',},
+                        {field: 'sourceCategory', title: '来源', align: 'center'},
+                        {field: 'sourceId', title: '前置单号', align: 'center'},
+                        {field: 'goodsId', title: '商品编号', align: 'center'},
+                        {field: 'goodsName', title: '商品名称', align: 'center'},
+                        {field: 'number', title: '入库数量', align: 'center'},
+                        {field: 'warehouseId', title: '入库库位', align: 'center'},
+                        {field: 'workerId', title: '填写人ID', align: 'center'},
+                        {title: '操作', align: 'center', toolbar: '#barDemo', fixed: 'right'},
+                    ]
+                ]
+            });
+            //监听头工具栏事件（添加，查询）
+            table.on('toolbar(main-table)', function (obj) {
+                switch (obj.event) {
+                    //添加
+                    case 'add':
+                        layer.open({
+                            type: 2,
+                            title: '入库单',
+                            content: '/warehouseIn/warehouseInPage',//指向页面地址
+                            shade: [0.8, '#393d49'],//透明度
+                            area: ['600px', '600px'],
+                            btn: ['提交', '取消'],
+                            yes: function (index, layero) {
+                                var iframeWindow = window['layui-layer-iframe' + index];
+                                var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                //监听提交
+                                iframeWindow.layui.form.on('submit(LAY-front-submit)', function (data) {
+                                    var field = data.field;
+                                    $.ajax({
+                                        url: '/warehouseIn/warehouseInAdd',
+                                        data: field,
+                                        async: false,//是否异步
+                                        cache: false,//缓存
+                                        success: function (str) {
+                                            if (str.code === 0) {
+                                                table.reload('table-load');
+                                            }
+                                            layer.msg(str.msg, {icon: str.icon, anim: str.anim});
+                                        }
+                                    });
+                                    layer.close(index);
+                                });
+                                submit.trigger('click');
+                            },
+                            success: function (layero, index) {
+                            }
+                        });
+                        break;
+
+                    //查询
+                    case 'querySearch':
+                        var param = $('#param').val();
+                        table.reload('table-load', {
+                            where: {
+                                param: param
+                            }
+                        });
+                        $('#param').val(param);
+                        break;
+                }
+            });
+            // //监听修改和删除功能
+            table.on('tool(main-table)',function (obj) {
+                var data = obj.data;
+                switch (obj.event) {
+                    case 'del':
+                        layer.confirm('确认删除？',function (index) {
+                            $.ajax({
+                                url: '/warehouseIn/warehouseInDelById?id=' +data.id,
+                                data: null,
+                                async: false,
+                                cache: false,
+                                success: function (str) {
+                                    table.reload('table-load');
+                                    layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                }
+                            });
+                        })
+                        break;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

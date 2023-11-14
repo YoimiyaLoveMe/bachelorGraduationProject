@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>新增硬件</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+    <script type="text/html" id="indexTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+</head>
+<body>
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-card-body" style="padding: 15px;">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-input-block">
+                        <input type="checkbox" name="role1" title="职位职权管理" value="job" th:checked="${set.contains('job')}">
+                        <input type="checkbox" name="role2" title="员工管理" value="worker" th:checked="${set.contains('worker')}">
+                        <input type="checkbox" name="role3" title="商品销售管理" value="goodsSale" th:checked="${set.contains('goodsSale')}">
+                        <input type="checkbox" name="role4" title="订单管理" value="order" th:checked="${set.contains('order')}">
+                        <input type="checkbox" name="role5" title="售后审核" value="afterSale" th:checked="${set.contains('afterSale')}">
+                        <input type="checkbox" name="role6" title="供应商管理" value="supplier" th:checked="${set.contains('supplier')}">
+                        <input type="checkbox" name="role7" title="供应商联系人管理" value="supplierContact" th:checked="${set.contains('supplierContact')}">
+                        <input type="checkbox" name="role8" title="供货管理" value="supply" th:checked="${set.contains('supply')}">
+                        <input type="checkbox" name="role9" title="申请采购" value="purchase" th:checked="${set.contains('purchase')}">
+                        <input type="checkbox" name="role10" title="采购审核" value="purchaseManage" th:checked="${set.contains('purchaseManage')}">
+                        <input type="checkbox" name="role11" title="库位库存" value="warehouse" th:checked="${set.contains('warehouse')}">
+                        <input type="checkbox" name="role12" title="商品库存" value="goodsStock" th:checked="${set.contains('goodsStock')}">
+                        <input type="checkbox" name="role13" title="入库" value="warehouseIn" th:checked="${set.contains('warehouseIn')}">
+                        <input type="checkbox" name="role14" title="出库" value="warehouseOut" th:checked="${set.contains('warehouseOut')}">
+                        <input type="checkbox" name="role15" title="库存调拨" value="stockExchange" th:checked="${set.contains('stockExchange')}">
+                        <input type="checkbox" name="role16" title="商品技术管理" value="goodsTech" th:checked="${set.contains('goodsTech')}">
+                        <input type="checkbox" name="role17" title="装配记录登记" value="assemble" th:checked="${set.contains('assemble')}">
+                        <input type="checkbox" name="role18" title="算法参数调整" value="aiac" th:checked="${set.contains('aiac')}">
+                        <input type="checkbox" name="role19" title="物流发货登记" value="logisticsOut" th:checked="${set.contains('logisticsOut')}">
+                        <input type="checkbox" name="role20" title="物流收货登记" value="logisticsIn" th:checked="${set.contains('logisticsIn')}">
+                    </div>
+
+                    <div class="layui-form-item layui-hide">
+                        <input type="button" lay-submit lay-filter="LAY-front-submit" id="LAY-front-submit" value="确认">
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/static/layui/layui.js}"></script>
+    <script>
+        layui.use(['form'],function () {
+            var $ = layui.$;
+
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

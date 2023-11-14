@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+		<link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+		<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+		 <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+		<title>Electro - HTML Ecommerce Template</title>
+
+		<!-- Google font -->
+		<link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
+
+		<!-- Bootstrap -->
+		<link type="text/css" rel="stylesheet" th:href="@{/static/shop/css/bootstrap.min.css}"/>
+
+		<!-- Slick -->
+		<link type="text/css" rel="stylesheet" th:href="@{/static/shop/css/slick.css}"/>
+		<link type="text/css" rel="stylesheet" th:href="@{/static/shop/css/slick-theme.css}"/>
+
+		<!-- nouislider -->
+		<link type="text/css" rel="stylesheet" th:href="@{/static/shop/css/nouislider.min.css}"/>
+
+		<!-- Font Awesome Icon -->
+		<link rel="stylesheet" th:href="@{/static/shop/css/font-awesome.min.css}">
+
+		<!-- Custom stlylesheet -->
+		<link type="text/css" rel="stylesheet" th:href="@{/static/shop/css/style.css}"/>
+
+		<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]-->
+<!--		  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>-->
+<!--		  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>-->
+		<!--[endif]-->
+
+		
+
+    </head>
+	
+	<body>
+		<!-- HEADER -->
+		<header>
+			<!-- TOP HEADER -->
+			<div id="top-header">
+				<div class="container">
+					<ul class="header-links pull-left" id="door">
+
+					</ul>
+					<ul class="header-links pull-right">
+						<li><a id="order"><i class="fa fa-dollar"></i>我的订单</a></li>
+						<li><a id="account"><i class="fa fa-first-order"></i>我的账户</a></li>
+					</ul>
+				</div>
+			</div>
+			<!-- /TOP HEADER -->
+
+			<!-- MAIN HEADER -->
+			<div id="header">
+				<!-- container -->
+				<div class="container">
+					<!-- row -->
+					<div class="row">
+						<!-- LOGO -->
+						<div class="col-md-3">
+							<div class="header-logo">
+								<a href="/index" class="logo">
+									<img src="static/shop/img/index.png" alt="">
+								</a>
+							</div>
+						</div>
+						<!-- /LOGO -->
+
+						<!-- SEARCH BAR -->
+						<div class="col-md-5">
+							<div class="header-search">
+								<form>
+									<select class="input-select">
+										<option value="">All Categories</option>
+										<option value="motherboard">主板</option>
+										<option value="cpu">芯片</option>
+										<option value="graphics_card">显卡</option>
+										<option value="ram">内存</option>
+										<option value="ssd">硬盘</option>
+										<option value="heatsink">散热器</option>
+										<option value="power">电源</option>
+										<option value="case">机箱</option>
+									</select>
+									<input class="input" placeholder="商品名称">
+									<button class="search-btn">搜索</button>
+								</form>
+							</div>
+						</div>
+						<!-- /SEARCH BAR -->
+
+						<!-- ACCOUNT -->
+						<div class="col-md-4 clearfix">
+							<div class="header-ctn">
+
+								<!-- Menu Toogle -->
+								<div>
+									<a href="#">
+										<i class="fa fa-bars"></i>
+										<span>商品列表</span>
+									</a>
+								</div>
+								<!-- /Menu Toogle -->
+
+								<!-- Wishlist -->
+								<div>
+									<a href="/goods/customer?type=love">
+										<i class="fa fa-heart-o"></i>
+										<span>心愿单</span>
+										<div class="qty" id="loveNumber"></div>
+									</a>
+								</div>
+								<!-- /Wishlist -->
+
+								<!-- Cart -->
+								<div>
+									<a href="/goods/customer?type=cart">
+										<i class="fa fa-shopping-cart"></i>
+										<span>购物车</span>
+										<div class="qty" id="cartNumber"></div>
+									</a>
+									</div>
+								</div>
+								<!-- /Cart -->
+
+							</div>
+						</div>
+						<!-- /ACCOUNT -->
+					</div>
+					<!-- row -->
+				</div>
+				<!-- container -->
+			</div>
+			<!-- /MAIN HEADER -->
+		</header>
+		<!-- /HEADER -->
+
+
+		<!-- NAVIGATION -->
+		<nav id="navigation">
+			<!-- container -->
+			<div class="container">
+				<!-- responsive-nav -->
+				<div id="responsive-nav">
+					<!-- NAV -->
+					<!-- <ul class="main-nav nav navbar-nav">
+						<li class="active"><a href="#">Home</a></li>
+						<li><a href="#">Hot Deals</a></li>
+						<li><a href="#">Categories</a></li>
+						<li><a href="#">Laptops</a></li>
+						<li><a href="#">Smartphones</a></li>
+						<li><a href="#">Cameras</a></li>
+						<li><a href="#">Accessories</a></li>
+					</ul> -->
+					<!-- /NAV -->
+				</div>
+				<!-- /responsive-nav -->
+			</div>
+			<!-- /container -->
+		</nav>
+		<!-- /NAVIGATION -->
+
+		<!-- HOT DEAL SECTION -->
+		<div id="hot-deal" class="section">
+			<!-- container -->
+			<div class="container">
+				<!-- row -->
+				<div class="row">
+					<div class="col-md-12">
+						<div class="hot-deal">
+							<ul class="hot-deal-countdown">
+								<li>
+									<div>
+										<h3>智</h3>
+										<span>Artificial</span>
+									</div>
+								</li>
+								<li>
+									<div>
+										<h3>能</h3>
+										<span>Intelligence</span>
+									</div>
+								</li>
+								<li>
+									<div>
+										<h3>装</h3>
+										<span>Assemble</span>
+									</div>
+								</li>
+								<li>
+									<div>
+										<h3>机</h3>
+										<span>Computer</span>
+									</div>
+								</li>
+							</ul>
+							<h2 class="text-uppercase">想DIY装机，但缺乏相关知识？</h2>
+							<p>智能装机给你专业解决方案</p>
+							<a class="primary-btn cta-btn" href="/goods/combinationForm">现在使用</a>
+						</div>
+					</div>
+				</div>
+				<!-- /row -->
+			</div>
+			<!-- /container -->
+		</div>
+		<!-- /HOT DEAL SECTION -->
+
+		<!-- SECTION HOT PRODUCT-->
+		<div class="section">
+			<!-- container -->
+			<div class="container">
+				<!-- row -->
+				<div class="row">
+
+					<!-- section title -->
+					<div class="col-md-12">
+						<div class="section-title">
+							<h3 class="title">热卖爆款</h3>
+						</div>
+					</div>
+					<!-- /section title -->
+
+					<!-- Products tab & slick -->
+					<div class="col-md-12">
+						<div class="row">
+							<div class="products-tabs">
+								<!-- tab -->
+								<div id="tab1" class="tab-pane active">
+									<div class="products-slick" data-nav="#slick-nav-1">
+										
+										<!-- product -->
+										<div class="product">
+											<div id="hotproduct0">
+												<div class="product-img">
+													<img alt="" id="hotproduct0-picture">
+													<div class="product-label">
+														<span class="new">HOT</span>
+													</div>
+												</div>
+												<div class="product-body">
+													<p class="product-category"></p>
+													<h3 class="product-name"><a id="hotproduct0-name"></a></h3>
+													<h4 class="product-price" id="hotproduct0-price"><del class="product-old-price"></del></h4>
+													<div class="product-rating">
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+													</div>
+													<div class="product-btns">
+														<button class="add-to-wishlist" id="hotproduct0-love"><i class="fa fa-heart-o"></i><span class="tooltipp">加入心愿单</span></button>
+														<button class="add-to-compare" id="hotproduct0-cart"><i class="fa fa-cart-arrow-down"></i><span class="tooltipp">加入购物车</span></button>
+													</div>
+												</div>
+												<div class="add-to-cart">
+													<button class="add-to-cart-btn" id="hotproduct0-buy"><i class="fa fa-cny"></i>立即购买</button>
+												</div>
+											</div>
+										</div>
+										<!-- /product -->
+
+										<!-- product -->
+										<div class="product">
+											<div id="hotproduct1">
+												<div class="product-img">
+													<img alt="" id="hotproduct1-picture">
+													<div class="product-label">
+														<span class="new">HOT</span>
+													</div>
+												</div>
+												<div class="product-body">
+													<p class="product-category"></p>
+													<h3 class="product-name"><a id="hotproduct1-name"></a></h3>
+													<h4 class="product-price" id="hotproduct1-price"><del class="product-old-price"></del></h4>
+													<div class="product-rating">
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+													</div>
+													<div class="product-btns">
+														<button class="add-to-wishlist" id="hotproduct1-love"><i class="fa fa-heart-o"></i><span class="tooltipp">加入心愿单</span></button>
+														<button class="add-to-compare" id="hotproduct1-cart"><i class="fa fa-cart-arrow-down"></i><span class="tooltipp">加入购物车</span></button>
+													</div>
+												</div>
+												<div class="add-to-cart">
+													<button class="add-to-cart-btn" id="hotproduct1-buy"><i class="fa fa-cny"></i>立即购买</button>
+												</div>
+											</div>
+										</div>
+										<!-- /product -->
+
+										<!-- product -->
+										<div class="product">
+											<div id="hotproduct2">
+												<div class="product-img">
+													<img alt="" id="hotproduct2-picture">
+													<div class="product-label">
+														<span class="new">HOT</span>
+													</div>
+												</div>
+												<div class="product-body">
+													<p class="product-category"></p>
+													<h3 class="product-name"><a id="hotproduct2-name"></a></h3>
+													<h4 class="product-price" id="hotproduct2-price"><del class="product-old-price"></del></h4>
+													<div class="product-rating">
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+													</div>
+													<div class="product-btns">
+														<button class="add-to-wishlist" id="hotproduct2-love"><i class="fa fa-heart-o"></i><span class="tooltipp">加入心愿单</span></button>
+														<button class="add-to-compare" id="hotproduct2-cart"><i class="fa fa-cart-arrow-down"></i><span class="tooltipp">加入购物车</span></button>
+													</div>
+												</div>
+												<div class="add-to-cart">
+													<button class="add-to-cart-btn" id="hotproduct2-buy"><i class="fa fa-cny"></i>立即购买</button>
+												</div>
+											</div>
+										</div>
+										<!-- /product -->
+
+										<!-- product -->
+										<div class="product">
+											<div id="hotproduct3">
+												<div class="product-img">
+													<img alt="" id="hotproduct3-picture">
+													<div class="product-label">
+														<span class="new">HOT</span>
+													</div>
+												</div>
+												<div class="product-body">
+													<p class="product-category"></p>
+													<h3 class="product-name"><a id="hotproduct3-name"></a></h3>
+													<h4 class="product-price" id="hotproduct3-price"><del class="product-old-price"></del></h4>
+													<div class="product-rating">
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+													</div>
+													<div class="product-btns">
+														<button class="add-to-wishlist" id="hotproduct3-love"><i class="fa fa-heart-o"></i><span class="tooltipp">加入心愿单</span></button>
+														<button class="add-to-compare" id="hotproduct3-cart"><i class="fa fa-cart-arrow-down"></i><span class="tooltipp">加入购物车</span></button>
+													</div>
+												</div>
+												<div class="add-to-cart">
+													<button class="add-to-cart-btn" id="hotproduct3-buy"><i class="fa fa-cny"></i>立即购买</button>
+												</div>
+											</div>
+										</div>
+										<!-- /product -->
+
+										<!-- product -->
+										<div class="product">
+											<div id="hotproduct4">
+												<div class="product-img">
+													<img alt="" id="hotproduct4-picture">
+													<div class="product-label">
+														<span class="new">HOT</span>
+													</div>
+												</div>
+												<div class="product-body">
+													<p class="product-category"></p>
+													<h3 class="product-name"><a id="hotproduct4-name"></a></h3>
+													<h4 class="product-price" id="hotproduct4-price"><del class="product-old-price"></del></h4>
+													<div class="product-rating">
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+													</div>
+													<div class="product-btns">
+														<button class="add-to-wishlist" id="hotproduct4-love"><i class="fa fa-heart-o"></i><span class="tooltipp">加入心愿单</span></button>
+														<button class="add-to-compare" id="hotproduct4-cart"><i class="fa fa-cart-arrow-down"></i><span class="tooltipp">加入购物车</span></button>
+													</div>
+												</div>
+												<div class="add-to-cart">
+													<button class="add-to-cart-btn" id="hotproduct4-buy"><i class="fa fa-cny"></i>立即购买</button>
+												</div>
+											</div>
+										</div>
+										<!-- /product -->
+
+									</div>
+									<div id="slick-nav-1" class="products-slick-nav"></div>
+								</div>
+								<!-- /tab -->
+							</div>
+						</div>
+					</div>
+					<!-- Products tab & slick -->
+				</div>
+				<!-- /row -->
+			</div>
+			<!-- /container -->
+		</div>
+		<!-- /SECTION -->
+
+		<!-- SECTION NEW PRODUCT-->
+		<div class="section">
+			<!-- container -->
+			<div class="container">
+				<!-- row -->
+				<div class="row">
+
+					<!-- section title -->
+					<div class="col-md-12">
+						<div class="section-title">
+							<h3 class="title">新品上市</h3>
+						</div>
+					</div>
+					<!-- /section title -->
+
+					<!-- Products tab & slick -->
+					<div class="col-md-12">
+						<div class="row">
+							<div class="products-tabs">
+								<!-- tab -->
+								<div id="tab2" class="tab-pane fade in active">
+									<div class="products-slick" data-nav="#slick-nav-2">
+
+										<!-- product -->
+										<div class="product">
+											<div id="newproduct0">
+												<div class="product-img">
+													<img alt="" id="newproduct0-picture">
+													<div class="product-label">
+														<span class="new">NEW</span>
+													</div>
+												</div>
+												<div class="product-body">
+													<p class="product-category"></p>
+													<h3 class="product-name"><a id="newproduct0-name"></a></h3>
+													<h4 class="product-price" id="newproduct0-price"><del class="product-old-price"></del></h4>
+													<div class="product-rating">
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+													</div>
+													<div class="product-btns">
+														<button class="add-to-wishlist" id="newproduct0-love"><i class="fa fa-heart-o"></i><span class="tooltipp">加入心愿单</span></button>
+														<button class="add-to-compare" id="newproduct0-cart"><i class="fa fa-cart-arrow-down"></i><span class="tooltipp">加入购物车</span></button>
+													</div>
+												</div>
+												<div class="add-to-cart">
+													<button class="add-to-cart-btn" id="newproduct0-buy"><i class="fa fa-cny"></i>立即购买</button>
+												</div>
+											</div>
+										</div>
+										<!-- /product -->
+
+										<!-- product -->
+										<div class="product">
+											<div id="newproduct1">
+												<div class="product-img">
+													<img alt="" id="newproduct1-picture">
+													<div class="product-label">
+														<span class="new">NEW</span>
+													</div>
+												</div>
+												<div class="product-body">
+													<p class="product-category"></p>
+													<h3 class="product-name"><a href="#" id="newproduct1-name"></a></h3>
+													<h4 class="product-price" id="newproduct1-price"><del class="product-old-price"></del></h4>
+													<div class="product-rating">
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+													</div>
+													<div class="product-btns">
+														<button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">加入心愿单</span></button>
+														<button class="add-to-compare"><i class="fa fa-cart-arrow-down"></i><span class="tooltipp">加入购物车</span></button>
+													</div>
+												</div>
+												<div class="add-to-cart">
+													<button class="add-to-cart-btn"><i class="fa fa-cny"></i>立即购买</button>
+												</div>
+											</div>
+										</div>
+										<!-- /product -->
+
+										<!-- product -->
+										<div class="product">
+											<div id="newproduct2">
+												<div class="product-img">
+													<img alt="" id="newproduct2-picture">
+													<div class="product-label">
+														<span class="new">NEW</span>
+													</div>
+												</div>
+												<div class="product-body">
+													<p class="product-category"></p>
+													<h3 class="product-name"><a href="#" id="newproduct2-name"></a></h3>
+													<h4 class="product-price" id="newproduct2-price"><del class="product-old-price"></del></h4>
+													<div class="product-rating">
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+													</div>
+													<div class="product-btns">
+														<button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">加入心愿单</span></button>
+														<button class="add-to-compare"><i class="fa fa-cart-arrow-down"></i><span class="tooltipp">加入购物车</span></button>
+													</div>
+												</div>
+												<div class="add-to-cart">
+													<button class="add-to-cart-btn"><i class="fa fa-cny"></i>立即购买</button>
+												</div>
+											</div>
+										</div>
+										<!-- /product -->
+
+										<!-- product -->
+										<div class="product">
+											<div id="newproduct3">
+												<div class="product-img">
+													<img alt="" id="newproduct3-picture">
+													<div class="product-label">
+														<span class="new">NEW</span>
+													</div>
+												</div>
+												<div class="product-body">
+													<p class="product-category"></p>
+													<h3 class="product-name"><a href="#" id="newproduct3-name"></a></h3>
+													<h4 class="product-price" id="newproduct3-price"><del class="product-old-price"></del></h4>
+													<div class="product-rating">
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+													</div>
+													<div class="product-btns">
+														<button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">加入心愿单</span></button>
+														<button class="add-to-compare"><i class="fa fa-cart-arrow-down"></i><span class="tooltipp">加入购物车</span></button>
+													</div>
+												</div>
+												<div class="add-to-cart">
+													<button class="add-to-cart-btn"><i class="fa fa-cny"></i>立即购买</button>
+												</div>
+											</div>
+										</div>
+										<!-- /product -->
+
+										<!-- product -->
+										<div class="product">
+											<div id="newproduct4">
+												<div class="product-img">
+													<img alt="" id="newproduct4-picture">
+													<div class="product-label">
+														<span class="new">NEW</span>
+													</div>
+												</div>
+												<div class="product-body">
+													<p class="product-category"></p>
+													<h3 class="product-name"><a href="#" id="newproduct4-name"></a></h3>
+													<h4 class="product-price" id="newproduct4-price"><del class="product-old-price"></del></h4>
+													<div class="product-rating">
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+													</div>
+													<div class="product-btns">
+														<button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">加入心愿单</span></button>
+														<button class="add-to-compare"><i class="fa fa-cart-arrow-down"></i><span class="tooltipp">加入购物车</span></button>
+													</div>
+												</div>
+												<div class="add-to-cart">
+													<button class="add-to-cart-btn"><i class="fa fa-cny"></i>立即购买</button>
+												</div>
+											</div>
+										</div>
+										<!-- /product -->
+										
+									</div>
+									<div id="slick-nav-2" class="products-slick-nav"></div>
+								</div>
+								<!-- /tab -->
+							</div>
+						</div>
+					</div>
+					<!-- /Products tab & slick -->
+				</div>
+				<!-- /row -->
+			</div>
+			<!-- /container -->
+		</div>
+		<!-- /SECTION -->
+
+		<!-- SECTION RANDOM PRODUCT-->
+		<div class="section">
+			<!-- container -->
+			<div class="container">
+				<!-- row -->
+				<div class="row">
+		
+					<!-- section title -->
+					<div class="col-md-12">
+						<div class="section-title">
+							<h3 class="title">好货推荐</h3>
+						</div>
+					</div>
+					<!-- /section title -->
+		
+					<!-- Products tab & slick -->
+					<div id="sale-product" class="col-md-12">
+						<div class="row">
+							<div class="products-tabs">
+								<!-- tab -->
+								<div id="tab3" class="tab-pane fade in active">
+									<div class="products-slick" data-nav="#slick-nav-3" >
+
+										<!-- product -->
+										<div class="product">
+											<div id="randomproduct0">
+												<div class="product-img">
+													<img alt="" id="randomproduct0-picture">
+													<div class="product-label">
+														<span class="new">COM</span>
+													</div>
+												</div>
+												<div class="product-body">
+													<p class="product-category"></p>
+													<h3 class="product-name"><a id="randomproduct0-name"></a></h3>
+													<h4 class="product-price" id="randomproduct0-price"><del class="product-old-price"></del></h4>
+													<div class="product-rating">
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+													</div>
+													<div class="product-btns">
+														<button class="add-to-wishlist" id="randomproduct0-love"><i class="fa fa-heart-o"></i><span class="tooltipp">加入心愿单</span></button>
+														<button class="add-to-compare" id="randomproduct0-cart"><i class="fa fa-cart-arrow-down"></i><span class="tooltipp">加入购物车</span></button>
+													</div>
+												</div>
+												<div class="add-to-cart">
+													<button class="add-to-cart-btn" id="randomproduct0-buy"><i class="fa fa-cny"></i>立即购买</button>
+												</div>
+											</div>
+										</div>
+										<!-- /product -->
+
+										<!-- product -->
+										<div class="product">
+											<div id="randomproduct1">
+												<div class="product-img">
+													<img alt="" id="randomproduct1-picture">
+													<div class="product-label">
+														<span class="new">COM</span>
+													</div>
+												</div>
+												<div class="product-body">
+													<p class="product-category"></p>
+													<h3 class="product-name"><a href="#" id="randomproduct1-name"></a></h3>
+													<h4 class="product-price" id="randomproduct1-price"><del class="product-old-price"></del></h4>
+													<div class="product-rating">
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+													</div>
+													<div class="product-btns">
+														<button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">加入心愿单</span></button>
+														<button class="add-to-compare"><i class="fa fa-cart-arrow-down"></i><span class="tooltipp">加入购物车</span></button>
+													</div>
+												</div>
+												<div class="add-to-cart">
+													<button class="add-to-cart-btn"><i class="fa fa-cny"></i>立即购买</button>
+												</div>
+											</div>
+										</div>
+										<!-- /product -->
+
+										<!-- product -->
+										<div class="product">
+											<div id="randomproduct2">
+												<div class="product-img">
+													<img alt="" id="randomproduct2-picture">
+													<div class="product-label">
+														<span class="new">COM</span>
+													</div>
+												</div>
+												<div class="product-body">
+													<p class="product-category"></p>
+													<h3 class="product-name"><a href="#" id="randomproduct2-name"></a></h3>
+													<h4 class="product-price" id="randomproduct2-price"><del class="product-old-price"></del></h4>
+													<div class="product-rating">
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+													</div>
+													<div class="product-btns">
+														<button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">加入心愿单</span></button>
+														<button class="add-to-compare"><i class="fa fa-cart-arrow-down"></i><span class="tooltipp">加入购物车</span></button>
+													</div>
+												</div>
+												<div class="add-to-cart">
+													<button class="add-to-cart-btn"><i class="fa fa-cny"></i>立即购买</button>
+												</div>
+											</div>
+										</div>
+										<!-- /product -->
+
+										<!-- product -->
+										<div class="product">
+											<div id="randomproduct3">
+												<div class="product-img">
+													<img alt="" id="randomproduct3-picture">
+													<div class="product-label">
+														<span class="new">COM</span>
+													</div>
+												</div>
+												<div class="product-body">
+													<p class="product-category"></p>
+													<h3 class="product-name"><a href="#" id="randomproduct3-name"></a></h3>
+													<h4 class="product-price" id="randomproduct3-price"><del class="product-old-price"></del></h4>
+													<div class="product-rating">
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+													</div>
+													<div class="product-btns">
+														<button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">加入心愿单</span></button>
+														<button class="add-to-compare"><i class="fa fa-cart-arrow-down"></i><span class="tooltipp">加入购物车</span></button>
+													</div>
+												</div>
+												<div class="add-to-cart">
+													<button class="add-to-cart-btn"><i class="fa fa-cny"></i>立即购买</button>
+												</div>
+											</div>
+										</div>
+										<!-- /product -->
+
+										<!-- product -->
+										<div class="product">
+											<div id="randomproduct4">
+												<div class="product-img">
+													<img alt="" id="randomproduct4-picture">
+													<div class="product-label">
+														<span class="new">COM</span>
+													</div>
+												</div>
+												<div class="product-body">
+													<p class="product-category"></p>
+													<h3 class="product-name"><a href="#" id="randomproduct4-name"></a></h3>
+													<h4 class="product-price" id="randomproduct4-price"><del class="product-old-price"></del></h4>
+													<div class="product-rating">
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+														<i class="fa fa-star"></i>
+													</div>
+													<div class="product-btns">
+														<button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">加入心愿单</span></button>
+														<button class="add-to-compare"><i class="fa fa-cart-arrow-down"></i><span class="tooltipp">加入购物车</span></button>
+													</div>
+												</div>
+												<div class="add-to-cart">
+													<button class="add-to-cart-btn"><i class="fa fa-cny"></i>立即购买</button>
+												</div>
+											</div>
+										</div>
+										<!-- /product -->
+										
+									</div>
+									<div id="slick-nav-3" class="products-slick-nav"></div>
+								</div>
+								<!-- /tab -->
+							</div>
+						</div>
+					</div>
+					<!-- /Products tab & slick -->
+				</div>
+				<!-- /row -->
+			</div>
+			<!-- /container -->
+		</div>
+		<!-- /SECTION -->
+
+		<!-- FOOTER -->
+		<footer id="footer">
+			<!-- top footer -->
+			<div class="section">
+				<!-- container -->
+				<div class="container">
+					<!-- row -->
+					<div class="row">
+						<div class="col-md-3 col-xs-6">
+							<div class="footer">
+								<h3 class="footer-title">About Us</h3>
+								<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut.</p>
+								<ul class="footer-links">
+									<li><a href="#"><i class="fa fa-map-marker"></i>1734 Stonecoal Road</a></li>
+									<li><a href="#"><i class="fa fa-phone"></i>+021-95-51-84</a></li>
+									<li><a href="#"><i class="fa fa-envelope-o"></i>email@email.com</a></li>
+								</ul>
+							</div>
+						</div>
+
+						<div class="col-md-3 col-xs-6">
+							<div class="footer">
+								<h3 class="footer-title">Categories</h3>
+								<ul class="footer-links">
+									<li><a href="#">Hot deals</a></li>
+									<li><a href="#">Laptops</a></li>
+									<li><a href="#">Smartphones</a></li>
+									<li><a href="#">Cameras</a></li>
+									<li><a href="#">Accessories</a></li>
+								</ul>
+							</div>
+						</div>
+
+						<div class="clearfix visible-xs"></div>
+
+						<div class="col-md-3 col-xs-6">
+							<div class="footer">
+								<h3 class="footer-title">Information</h3>
+								<ul class="footer-links">
+									<li><a href="#">About Us</a></li>
+									<li><a href="#">Contact Us</a></li>
+									<li><a href="#">Privacy Policy</a></li>
+									<li><a href="#">Orders and Returns</a></li>
+									<li><a href="#">Terms & Conditions</a></li>
+								</ul>
+							</div>
+						</div>
+
+						<div class="col-md-3 col-xs-6">
+							<div class="footer">
+								<h3 class="footer-title">Service</h3>
+								<ul class="footer-links">
+									<li><a href="#">My Account</a></li>
+									<li><a href="#">View Cart</a></li>
+									<li><a href="#">Wishlist</a></li>
+									<li><a href="#">Track My Order</a></li>
+									<li><a href="#">Help</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<!-- /row -->
+				</div>
+				<!-- /container -->
+			</div>
+			<!-- /top footer -->
+		</footer>
+		<!-- /FOOTER -->
+
+<!--<script th:src="@{/static/shop/js/jquery.min.js}"></script>-->
+<!--<script th:src="@{/static/shop/js/jquery.zoom.min.js}"></script>-->
+<script th:src="@{/static/shop/js/bootstrap.min.js}"></script>
+<script th:src="@{/static/shop/js/slick.min.js}"></script>
+<script th:src="@{/static/shop/js/nouislider.min.js}"></script>
+<script th:src="@{/static/shop/js/main.js}"></script>
+<script th:src="@{/static/layui/layui.js}"></script>
+
+		<!--获取热卖爆款商品-->
+		<script	type="text/javascript">
+			$(window).load(function (){
+				$.ajax({
+					type: 'GET',
+					url: '/goods/hotGoodsList?index=5',
+					dataType : 'json',
+					cache: false,
+					success: function (data){
+						for (var i = 0; i < data.data.length; i++) {
+							//商品展示图
+							$("#hotproduct"+i+"-picture").attr("src","/static/shop/img/"+data.data[i].picture);
+							//商品名称
+							$("#hotproduct"+i+"-name").text(data.data[i].name);
+							//商品价格
+							$("#hotproduct"+i+"-price").html("￥"+data.data[i].salePrice+"<del class=\"product-old-price\">￥"+data.data[i].price+"</del>");
+							//记录商品id
+							$("#hotproduct"+i).attr("value",data.data[i].id);
+						}
+					}
+				})
+			})
+		</script>
+
+		<!--获取新品上市商品-->
+		<script	type="text/javascript">
+			$(window).load(function (){
+				$.ajax({
+					type: 'GET',
+					url: '/goods/newGoodsList?index=5',
+					dataType : 'json',
+					cache: false,
+					success: function (data){
+						for (var i = 0; i < data.data.length; i++) {
+							//商品展示图
+							$("#newproduct"+i+"-picture").attr("src","/static/shop/img/"+data.data[i].picture);
+							//商品名称
+							$("#newproduct"+i+"-name").text(data.data[i].name);
+							//商品价格
+							$("#newproduct"+i+"-price").html("￥"+data.data[i].salePrice+"<del class=\"product-old-price\">￥"+data.data[i].price+"</del>");
+							//记录商品id
+							$("#newproduct"+i).attr("value",data.data[i].id);
+						}
+					}
+				})
+			})
+		</script>
+
+		<!--获取好货推荐商品-->
+		<script	type="text/javascript">
+			$(window).load(function (){
+				$.ajax({
+					type: 'GET',
+					url: '/goods/randomGoodsList?index=5',
+					dataType : 'json',
+					cache: false,
+					success: function (data){
+						for (var i = 0; i < data.data.length; i++) {
+							//商品展示图
+							$("#randomproduct"+i+"-picture").attr("src","/static/shop/img/"+data.data[i].picture);
+							//商品名称
+							$("#randomproduct"+i+"-name").text(data.data[i].name);
+							//商品价格
+							$("#randomproduct"+i+"-price").html("￥"+data.data[i].salePrice+"<del class=\"product-old-price\">￥"+data.data[i].price+"</del>");
+							//记录商品id
+							$("#randomproduct"+i).attr("value",data.data[i].id);
+						}
+					}
+				})
+			})
+		</script>
+		
+<!--点击商品事件-->
+		<script>
+			$(document).ready(function(){
+				$("#hotproduct0-buy").click(function(){
+					var id = $("#hotproduct0").attr("value");
+					//打开新窗口
+					//window.open("/goods/product?id="+id);
+					//当前窗口跳转
+					location.href="/goods/product?id=" + id;
+				});
+				layui.use(['form'],function () {
+					$("#hotproduct0-love").click(function(){
+						var id = $("#hotproduct0").attr("value");
+						$.ajax({
+							url: '/shop/addLove?id=' +id,
+							data: null,
+							async: false,
+							cache: false,
+							success: function (str) {
+								layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+							}
+						})
+					})
+					$("#hotproduct0-cart").click(function(){
+						var id = $("#hotproduct0").attr("value");
+						$.ajax({
+							url: '/shop/addCart?id=' + id +'&number=1',
+							data: null,
+							async: false,
+							cache: false,
+							success: function (str) {
+								layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+							}
+						})
+					})
+				});
+			});
+		</script>
+		<script>
+			$(document).ready(function(){
+				$("#hotproduct1-buy").click(function(){
+					var id = $("#hotproduct1").attr("value");
+					//当前窗口跳转
+					location.href="/goods/product?id=" + id;
+				});
+				layui.use(['form'],function () {
+					$("#hotproduct1-love").click(function(){
+						var id = $("#hotproduct1").attr("value");
+						$.ajax({
+							url: '/shop/addLove?id=' +id,
+							data: null,
+							async: false,
+							cache: false,
+							success: function (str) {
+								layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+							}
+						})
+					})
+					$("#hotproduct1-cart").click(function(){
+						var id = $("#hotproduct1").attr("value");
+						$.ajax({
+							url: '/shop/addCart?id=' + id +'&number=1',
+							data: null,
+							async: false,
+							cache: false,
+							success: function (str) {
+								layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+							}
+						})
+					})
+				});
+			});
+		</script>
+		<script>
+			$(document).ready(function(){
+				$("#hotproduct2-buy").click(function(){
+					var id = $("#hotproduct2").attr("value");
+					//打开新窗口
+					//window.open("/goods/product?id="+id);
+					//当前窗口跳转
+					location.href="/goods/product?id=" + id;
+				});
+				layui.use(['form'],function () {
+					$("#hotproduct2-love").click(function(){
+						var id = $("#hotproduct2").attr("value");
+						$.ajax({
+							url: '/shop/addLove?id=' +id,
+							data: null,
+							async: false,
+							cache: false,
+							success: function (str) {
+								layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+							}
+						})
+					})
+					$("#hotproduct2-cart").click(function(){
+						var id = $("#hotproduct2").attr("value");
+						$.ajax({
+							url: '/shop/addCart?id=' + id +'&number=1',
+							data: null,
+							async: false,
+							cache: false,
+							success: function (str) {
+								layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+							}
+						})
+					})
+				});
+			});
+		</script>
+		<script>
+			$(document).ready(function(){
+				$("#hotproduct3-buy").click(function(){
+					var id = $("#hotproduct3").attr("value");
+					//打开新窗口
+					//window.open("/goods/product?id="+id);
+					//当前窗口跳转
+					location.href="/goods/product?id=" + id;
+				});
+				layui.use(['form'],function () {
+					$("#hotproduct3-love").click(function(){
+						var id = $("#hotproduct3").attr("value");
+						$.ajax({
+							url: '/shop/addLove?id=' +id,
+							data: null,
+							async: false,
+							cache: false,
+							success: function (str) {
+								layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+							}
+						})
+					})
+					$("#hotproduct3-cart").click(function(){
+						var id = $("#hotproduct3").attr("value");
+						$.ajax({
+							url: '/shop/addCart?id=' + id +'&number=1',
+							data: null,
+							async: false,
+							cache: false,
+							success: function (str) {
+								layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+							}
+						})
+					})
+				});
+			});
+		</script>
+		<script>
+			$(document).ready(function(){
+				$("#hotproduct4-buy").click(function(){
+					var id = $("#hotproduct4").attr("value");
+					//打开新窗口
+					//window.open("/goods/product?id="+id);
+					//当前窗口跳转
+					location.href="/goods/product?id=" + id;
+				});
+				layui.use(['form'],function () {
+					$("#hotproduct4-love").click(function(){
+						var id = $("#hotproduct4").attr("value");
+						$.ajax({
+							url: '/shop/addLove?id=' +id,
+							data: null,
+							async: false,
+							cache: false,
+							success: function (str) {
+								layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+							}
+						})
+					})
+					$("#hotproduct4-cart").click(function(){
+						var id = $("#hotproduct4").attr("value");
+						$.ajax({
+							url: '/shop/addCart?id=' + id +'&number=1',
+							data: null,
+							async: false,
+							cache: false,
+							success: function (str) {
+								layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+							}
+						})
+					})
+				});
+			});
+		</script>
+
+<!--进入页面获取当前用户，并分别渲染页面顶端-->
+<script>
+	$(document).ready(function(){
+		$.ajax({
+			url: '/getUser',
+			type: 'GET',
+			dataType: 'json',
+			async: false,
+			cache: false,
+			success: function (user) {
+				$("#door").html("<li><i class=\"fa fa-user-o\"><a onclick='safe()'>" + user.name + "</a></li>\r" +
+								"<li><i class=\"fa fa-warning\"></i><a href=\"/logout\">" + "退出" + "</a></li>");
+				$.ajax({
+					url: '/shop/getLoveAndCart?id='+user.id,
+					type: 'GET',
+					async: false,
+					cache: false,
+					success: function (list){
+						$("#loveNumber").text(list[0]);
+						$("#cartNumber").text(list[1]);
+					}
+				})
+			},
+			error: function (){
+				$("#door").html("<li><a href=\"/login\">" + "登录或注册" + "</a></li>");
+			}
+		})
+	})
+</script>
+
+<!--		错误日志：layui弹窗未启用-->
+<!--		错误发现：代码错误-->
+<!--		注意layui弹出窗启用格式：layui.use(['layer'],function (){}-->
+
+<!--进入个人信息页面-->
+<script>
+	function safe(){
+		layui.use(['layer'],function (){
+			var layer = layui.layer;
+			layer.open({
+				type: 2,
+				title: '个人信息管理',
+				content: '/customerSafe',
+				shade: [0.8, '#393d49'],
+				area: ['600px', '300px'],
+				btn: ['提交', '取消'],
+				yes: function (index, layero) {
+					var iframeWindow = window['layui-layer-iframe' + index];
+					//提交按钮
+					var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+					//监听提交
+					iframeWindow.layui.form.on('submit(LAY-front-submit)', function (data) {
+						$.ajax({
+							url: '/customerEdit',
+							type:"POST",
+							data: data.field,
+							dataType: 'json',
+							async: false,
+							cache: false,
+							success: function (str) {
+								layer.msg(str.msg, {icon: str.icon, anim: str.anim});
+							}
+						});
+						layer.close(index);//关闭弹窗(关闭最上层页面)
+					});
+					submit.trigger('click');
+				},
+				success: function (layero, index) {
+				}
+			});
+			return false;
+		})
+	}
+</script>
+
+<!--进入订单-->
+<script>
+	$(document).ready(function(){
+		$("#order").click(function (){
+			$.ajax({
+				url: '/getUser',
+				type: 'GET',
+				dataType: 'json',
+				async: false,
+				cache: false,
+				success: function (user) {
+					location.href="/goods/customer?type=orderRetail"
+				},
+				error: function (){
+					alert("请先登录！")
+					location.href="/login"
+				}
+			})
+		})
+	})
+</script>
+
+<!--进入账户-->
+<script>
+	$(document).ready(function(){
+		$("#account").click(function (){
+			$.ajax({
+				url: '/getUser',
+				type: 'GET',
+				dataType: 'json',
+				async: false,
+				cache: false,
+				success: function (user) {
+					location.href="/goods/customer?type=ownInfo"
+				},
+				error: function (){
+					alert("请先登录！")
+					location.href="/login"
+				}
+			})
+		})
+	})
+</script>
+
+	</body>
+</html>

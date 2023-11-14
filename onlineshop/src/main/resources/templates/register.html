@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>员工入职</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+    <script type="text/html" id="indexTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+</head>
+<body class="layui-layout-body">
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-card-body" style="padding: 15px;">
+                <form class="layui-form layui-form-pane" action="">
+                    <!--name="*"和{obj?.*}应当与entity中定义的相同-->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">账号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="id" lay-verify="required" placeholder="手机号" autocomplete="off" class="layui-input" maxlength="11">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">姓名</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="name" lay-verify="required" placeholder="不超过10个字符" autocomplete="off" class="layui-input" maxlength="10">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">身份证号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="idCard" lay-verify="required" placeholder="请输入身份证号" autocomplete="off" class="layui-input" maxlength="18">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">性别</label>
+                        <div class="layui-input-block">
+                            <select name="sex">
+                                <option value="男">男</option>
+                                <option value="女">女</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">部门</label>
+                        <div class="layui-input-block">
+                            <select name="department" id="department" lay-filter="department">
+                                <option value="">请选择部门</option>
+                                <option value="技术部">技术部</option>
+                                <option value="销售部">销售部</option>
+                                <option value="采购部">采购部</option>
+                                <option value="仓储部">仓储部</option>
+                                <option value="物流部">物流部</option>
+                                <option value="人事部">人事部</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">职位</label>
+                        <div class="layui-input-block">
+                            <select name="job" id="job">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item" hidden="hidden">
+                        <label class="layui-form-label">密码</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="password" placeholder="自动填充" readonly="readonly" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+<!--                    弹出隐藏式再次确认按钮-->
+                    <div class="layui-form-item layui-hide">
+                        <input type="button" lay-submit lay-filter="LAY-front-submit" id="LAY-front-submit" value="确认">
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+<script th:src="@{/static/layui/layui.js}"></script>
+
+<script>
+    layui.use(['form'],function () {
+        var $ = layui.$;
+        var form = layui.form;
+
+        // //多表查询“部门”：如何去重？
+        // $.ajax({
+        //     url: '/worker/jobList',
+        //     dataType: 'json',
+        //     type: 'GET',
+        //     cache: false,
+        //     success: function (data) {
+        //         $('#department').prepend("<option value=''>请选择部门</option>");
+        //         for (var i = 0; i < data.data.length; i++) {
+        //                 $('#department').append("<option value='" + data.data[i].department + "'>" + data.data[i].department + "</option>");
+        //         }
+        //         form.render("select");//表单重载，下拉列表渲染，把内容加载进去
+        //     }
+        // });
+
+        //依据部门，查询对应的岗位
+        form.on('select(department)', function(data){
+            var departmentName = data.value; // departmentName 选中的部门名称
+            $.ajax({
+                url: '/job/jobList',
+                dataType: 'json',
+                type: 'GET',
+                cache: false,
+                success: function (data) {
+                    $("#job").empty();//清除原有选项
+                    for (var i = 0; i < data.data.length; i++) {
+                        if(departmentName == data.data[i].department){
+                            $('#job').append("<option value='" + data.data[i].id + "'>" + data.data[i].name + "</option>");
+                        }
+                    }
+                    form.render("select");
+                }
+            });
+        });
+    });
+</script>
+<script>
+    layui.use(['form'],function () {
+        var $ = layui.$;
+
+    });
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

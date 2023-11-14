@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>新增供货</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+    <script type="text/html" id="indexTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+</head>
+<!--<body class="layui-layout-body"> 去掉样式后弹出页面拥有滚动条-->
+<body>
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-card-body" style="padding: 15px;">
+                <form class="layui-form layui-form-pane" action="">
+<!--                    <input name="id" th:value="${obj?.id}" class="layui-input layui-hide">&lt;!&ndash;当使用修改功能时，name为指向数据,th:value="${obj?.}意为收到修改信息&ndash;&gt;-->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">供货编号</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="id" name="id" th:value="${obj?.id}" readonly="readonly" placeholder="自动输入" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">供货商编号</label>
+                        <div class="layui-input-block">
+                            <select name="supplierId" id="supplierId" lay-filter="supplierId" lay-search>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">供货商名称</label>
+                        <div class="layui-input-block">
+                            <select name="supplierName" id="supplierName" lay-filter="supplierName" lay-search>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">商品类别</label>
+                        <div class="layui-input-block">
+                            <select name="category" id="category" lay-filter="category" lay-search>
+                                <option value=''>请选择</option>
+                                <option value="motherboard" th:selected="${obj?.category eq 'motherboard'}">主板</option>
+                                <option value="cpu" th:selected="${obj?.category eq 'cpu'}">芯片</option>
+                                <option value="graphicscard" th:selected="${obj?.category eq 'graphicscard'}">显卡</option>
+                                <option value="ram" th:selected="${obj?.category eq 'ram'}">内存</option>
+                                <option value="ssd" th:selected="${obj?.category eq 'ssd'}">硬盘</option>
+                                <option value="heatsink" th:selected="${obj?.category eq 'heatsink'}">散热器</option>
+                                <option value="power" th:selected="${obj?.category eq 'power'}">电源</option>
+                                <option value="case" th:selected="${obj?.category eq 'case'}">机箱</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">商品编号</label>
+                        <div class="layui-input-block">
+                            <select name="goodsId" id="goodsId" lay-filter="goodsId" lay-search>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">商品名称</label>
+                        <div class="layui-input-block">
+                            <select name="goodsName" id="goodsName" lay-filter="goodsName" lay-search>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">单价</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="price" name="price" th:value="${obj?.price}" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">供应数量</label>
+                        <div class="layui-input-block">
+                            <input type="number" id="number" name="number" th:value="${obj?.number}" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">备注信息</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="information" name="information" th:value="${obj?.information}" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+<!--                    弹出隐藏式再次确认按钮-->
+                    <!--竟然会影响添加功能-->
+                    <div class="layui-form-item layui-hide">
+                        <input type="button" lay-submit lay-filter="LAY-front-submit" id="LAY-front-submit" value="确认">
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/static/layui/layui.js}"></script>
+
+    <script>
+        layui.use(['form'],function () {
+            var $ = layui.$;
+            var form = layui.form;
+            //当前供货商
+            var currentSupplierId = '[[${obj?.supplierId}]]';
+            //初始数据
+            $.ajax({
+                url: '/supplier/supplierList',
+                dataType: 'json',
+                type: 'GET',
+                cache: false,
+                success: function (data) {
+                    $('#supplierId').prepend("<option value=''>请选择</option>");
+                    $('#supplierName').prepend("<option value=''>请选择</option>");
+                    for (var i = 0; i < data.data.length; i++) {
+                        if (currentSupplierId == data.data[i].id) {
+                            $('#supplierId').append("<option selected value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                            $('#supplierName').append("<option selected value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                        } else {
+                            $('#supplierId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                            $('#supplierName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                        }
+                    }
+                    form.render();
+                }
+            });
+            //当改变供货商id时，连锁改变供货商名称
+            form.on('select(supplierId)', function(data){
+                var currentSupplierId = data.value;
+                $.ajax({
+                    url: '/supplier/supplierList',
+                    dataType: 'json',
+                    type: 'GET',
+                    cache: false,
+                    success: function (data) {
+                        $("#supplierName").empty();//清除原有选项
+                        for (var i = 0; i < data.data.length; i++) {
+                            if(currentSupplierId == data.data[i].id){
+                                $('#supplierName').append("<option selected value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }else {
+                                $('#supplierName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    }
+                });
+            });
+            //当改变供货商名称时，连锁改变供货商id
+            form.on('select(supplierName)', function(data){
+                var currentSupplierName = data.value;
+                $.ajax({
+                    url: '/supplier/supplierList',
+                    dataType: 'json',
+                    type: 'GET',
+                    cache: false,
+                    success: function (data) {
+                        $("#supplierId").empty();//清除原有选项
+                        for (var i = 0; i < data.data.length; i++) {
+                            if(currentSupplierName == data.data[i].name){
+                                $('#supplierId').append("<option selected value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                            }else {
+                                $('#supplierId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!--商品信息-->
+    <script>
+        layui.use(['form'],function () {
+            var $ = layui.$;
+            var form = layui.form;
+            //当前商品
+            var currentCategory = '[[${obj?.category}]]';
+            var currentGoodsId = '[[${obj?.goodsId}]]';
+            //初始数据
+            if(currentCategory == 'motherboard'){
+                $.ajax({
+                    url: '/goodsTech/motherboardList',
+                    dataType: 'json',
+                    type: 'GET',
+                    cache: false,
+                    success: function (data) {
+                        $('#goodsId').prepend("<option value=''>请选择</option>");
+                        for (var i = 0; i < data.data.length; i++) {
+                            if (currentGoodsId == data.data[i].id) {
+                                $('#goodsId').append("<option selected value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option selected value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            } else {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                        }
+                        form.render();
+                    }
+                });
+            }else if(currentCategory == 'cpu'){
+                $.ajax({
+                    url: '/goodsTech/cpuList',
+                    dataType: 'json',
+                    type: 'GET',
+                    cache: false,
+                    success: function (data) {
+                        $('#goodsId').prepend("<option value=''>请选择</option>");
+                        for (var i = 0; i < data.data.length; i++) {
+                            if (currentGoodsId == data.data[i].id) {
+                                $('#goodsId').append("<option selected value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option selected value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            } else {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                        }
+                        form.render();
+                    }
+                });
+            }else if(currentCategory == 'graphicscard'){
+                $.ajax({
+                    url: '/goodsTech/graphicscardList',
+                    dataType: 'json',
+                    type: 'GET',
+                    cache: false,
+                    success: function (data) {
+                        $('#goodsId').prepend("<option value=''>请选择</option>");
+                        for (var i = 0; i < data.data.length; i++) {
+                            if (currentGoodsId == data.data[i].id) {
+                                $('#goodsId').append("<option selected value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option selected value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            } else {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                        }
+                        form.render();
+                    }
+                });
+            }else if(currentCategory == 'ram'){
+                $.ajax({
+                    url: '/goodsTech/ramList',
+                    dataType: 'json',
+                    type: 'GET',
+                    cache: false,
+                    success: function (data) {
+                        $('#goodsId').prepend("<option value=''>请选择</option>");
+                        for (var i = 0; i < data.data.length; i++) {
+                            if (currentGoodsId == data.data[i].id) {
+                                $('#goodsId').append("<option selected value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option selected value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            } else {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                        }
+                        form.render();
+                    }
+                });
+            }else if(currentCategory == 'ssd'){
+                $.ajax({
+                    url: '/goodsTech/ssdList',
+                    dataType: 'json',
+                    type: 'GET',
+                    cache: false,
+                    success: function (data) {
+                        $('#goodsId').prepend("<option value=''>请选择</option>");
+                        for (var i = 0; i < data.data.length; i++) {
+                            if (currentGoodsId == data.data[i].id) {
+                                $('#goodsId').append("<option selected value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option selected value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            } else {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                        }
+                        form.render();
+                    }
+                });
+            }else if(currentCategory == 'heatsink'){
+                $.ajax({
+                    url: '/goodsTech/heatsinkList',
+                    dataType: 'json',
+                    type: 'GET',
+                    cache: false,
+                    success: function (data) {
+                        $('#goodsId').prepend("<option value=''>请选择</option>");
+                        for (var i = 0; i < data.data.length; i++) {
+                            if (currentGoodsId == data.data[i].id) {
+                                $('#goodsId').append("<option selected value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option selected value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            } else {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                        }
+                        form.render();
+                    }
+                });
+            }else if(currentCategory == 'power'){
+                $.ajax({
+                    url: '/goodsTech/powerList',
+                    dataType: 'json',
+                    type: 'GET',
+                    cache: false,
+                    success: function (data) {
+                        $('#goodsId').prepend("<option value=''>请选择</option>");
+                        for (var i = 0; i < data.data.length; i++) {
+                            if (currentGoodsId == data.data[i].id) {
+                                $('#goodsId').append("<option selected value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option selected value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            } else {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                        }
+                        form.render();
+                    }
+                });
+            }else if(currentCategory == 'case'){
+                $.ajax({
+                    url: '/goodsTech/caseList',
+                    dataType: 'json',
+                    type: 'GET',
+                    cache: false,
+                    success: function (data) {
+                        $('#goodsId').prepend("<option value=''>请选择</option>");
+                        for (var i = 0; i < data.data.length; i++) {
+                            if (currentGoodsId == data.data[i].id) {
+                                $('#goodsId').append("<option selected value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option selected value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            } else {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                        }
+                        form.render();
+                    }
+                });
+            }
+<!---------------------------------------------------------------------------------------------------------------------->
+            //当改变商品种类时，连锁改变商品id和商品名称选择列表
+            form.on('select(category)', function(data){
+                var category = data.value;
+                var list = null;
+                if(category == 'motherboard'){
+                    $.ajax({
+                        url: '/goodsTech/motherboardList',
+                        dataType: 'json',
+                        type: 'GET',
+                        cache: false,
+                        success: function (data) {
+                            $("#goodsId").empty();//清除原有选项
+                            $("#goodsName").empty();//清除原有选项
+                            for (var i = 0; i < data.data.length; i++) {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                            form.render("select");
+                            list = data;
+                        }
+                    });
+                    //当改变商品id时，连锁改变商品名称
+                    form.on('select(goodsId)', function(data){
+                        var currentGoodsId = data.value;
+                        $("#goodsName").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsId == list.data[i].id){
+                                $('#goodsName').append("<option selected value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }else {
+                                $('#goodsName').append("<option value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    });
+                    //当改变商品名称时，连锁改变商品id
+                    form.on('select(goodsName)', function(data){
+                        var currentGoodsName = data.value;
+                        $("#goodsId").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsName == list.data[i].name){
+                                $('#goodsId').append("<option selected value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }else {
+                                $('#goodsId').append("<option value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    });
+                }else if (category == 'cpu'){
+                    $.ajax({
+                        url: '/goodsTech/cpuList',
+                        dataType: 'json',
+                        type: 'GET',
+                        cache: false,
+                        success: function (data) {
+                            $("#goodsId").empty();//清除原有选项
+                            $("#goodsName").empty();//清除原有选项
+                            for (var i = 0; i < data.data.length; i++) {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                            form.render("select");
+                            list = data;
+                        }
+                    });
+                    //当改变商品id时，连锁改变商品名称
+                    form.on('select(goodsId)', function(data){
+                        var currentGoodsId = data.value;
+                        $("#goodsName").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsId == list.data[i].id){
+                                $('#goodsName').append("<option selected value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }else {
+                                $('#goodsName').append("<option value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    });
+                    //当改变商品名称时，连锁改变商品id
+                    form.on('select(goodsName)', function(data){
+                        var currentGoodsName = data.value;
+                        $("#goodsId").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsName == list.data[i].name){
+                                $('#goodsId').append("<option selected value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }else {
+                                $('#goodsId').append("<option value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    });
+                }else if (category == 'graphicscard'){
+                    $.ajax({
+                        url: '/goodsTech/graphicscardList',
+                        dataType: 'json',
+                        type: 'GET',
+                        cache: false,
+                        success: function (data) {
+                            $("#goodsId").empty();//清除原有选项
+                            $("#goodsName").empty();//清除原有选项
+                            for (var i = 0; i < data.data.length; i++) {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                            form.render("select");
+                            list = data;
+                        }
+                    });
+                    //当改变商品id时，连锁改变商品名称
+                    form.on('select(goodsId)', function(data){
+                        var currentGoodsId = data.value;
+                        $("#goodsName").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsId == list.data[i].id){
+                                $('#goodsName').append("<option selected value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }else {
+                                $('#goodsName').append("<option value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    });
+                    //当改变商品名称时，连锁改变商品id
+                    form.on('select(goodsName)', function(data){
+                        var currentGoodsName = data.value;
+                        $("#goodsId").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsName == list.data[i].name){
+                                $('#goodsId').append("<option selected value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }else {
+                                $('#goodsId').append("<option value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    });
+                }else if (category == 'ram'){
+                    $.ajax({
+                        url: '/goodsTech/ramList',
+                        dataType: 'json',
+                        type: 'GET',
+                        cache: false,
+                        success: function (data) {
+                            $("#goodsId").empty();//清除原有选项
+                            $("#goodsName").empty();//清除原有选项
+                            for (var i = 0; i < data.data.length; i++) {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                            form.render("select");
+                            list = data;
+                        }
+                    });
+                    //当改变商品id时，连锁改变商品名称
+                    form.on('select(goodsId)', function(data){
+                        var currentGoodsId = data.value;
+                        $("#goodsName").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsId == list.data[i].id){
+                                $('#goodsName').append("<option selected value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }else {
+                                $('#goodsName').append("<option value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    });
+                    //当改变商品名称时，连锁改变商品id
+                    form.on('select(goodsName)', function(data){
+                        var currentGoodsName = data.value;
+                        $("#goodsId").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsName == list.data[i].name){
+                                $('#goodsId').append("<option selected value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }else {
+                                $('#goodsId').append("<option value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    });
+                }else if (category == 'ssd'){
+                    $.ajax({
+                        url: '/goodsTech/ssdList',
+                        dataType: 'json',
+                        type: 'GET',
+                        cache: false,
+                        success: function (data) {
+                            $("#goodsId").empty();//清除原有选项
+                            $("#goodsName").empty();//清除原有选项
+                            for (var i = 0; i < data.data.length; i++) {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                            form.render("select");
+                            list = data;
+                        }
+                    });
+                    //当改变商品id时，连锁改变商品名称
+                    form.on('select(goodsId)', function(data){
+                        var currentGoodsId = data.value;
+                        $("#goodsName").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsId == list.data[i].id){
+                                $('#goodsName').append("<option selected value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }else {
+                                $('#goodsName').append("<option value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    });
+                    //当改变商品名称时，连锁改变商品id
+                    form.on('select(goodsName)', function(data){
+                        var currentGoodsName = data.value;
+                        $("#goodsId").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsName == list.data[i].name){
+                                $('#goodsId').append("<option selected value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }else {
+                                $('#goodsId').append("<option value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    });
+                }else if (category == 'heatsink'){
+                    $.ajax({
+                        url: '/goodsTech/heatsinkList',
+                        dataType: 'json',
+                        type: 'GET',
+                        cache: false,
+                        success: function (data) {
+                            $("#goodsId").empty();//清除原有选项
+                            $("#goodsName").empty();//清除原有选项
+                            for (var i = 0; i < data.data.length; i++) {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                            form.render("select");
+                            list = data;
+                        }
+                    });
+                    //当改变商品id时，连锁改变商品名称
+                    form.on('select(goodsId)', function(data){
+                        var currentGoodsId = data.value;
+                        $("#goodsName").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsId == list.data[i].id){
+                                $('#goodsName').append("<option selected value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }else {
+                                $('#goodsName').append("<option value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    });
+                    //当改变商品名称时，连锁改变商品id
+                    form.on('select(goodsName)', function(data){
+                        var currentGoodsName = data.value;
+                        $("#goodsId").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsName == list.data[i].name){
+                                $('#goodsId').append("<option selected value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }else {
+                                $('#goodsId').append("<option value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    });
+                }else if (category == 'power'){
+                    $.ajax({
+                        url: '/goodsTech/powerList',
+                        dataType: 'json',
+                        type: 'GET',
+                        cache: false,
+                        success: function (data) {
+                            $("#goodsId").empty();//清除原有选项
+                            $("#goodsName").empty();//清除原有选项
+                            for (var i = 0; i < data.data.length; i++) {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                            form.render("select");
+                            list = data;
+                        }
+                    });
+                    //当改变商品id时，连锁改变商品名称
+                    form.on('select(goodsId)', function(data){
+                        var currentGoodsId = data.value;
+                        $("#goodsName").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsId == list.data[i].id){
+                                $('#goodsName').append("<option selected value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }else {
+                                $('#goodsName').append("<option value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    });
+                    //当改变商品名称时，连锁改变商品id
+                    form.on('select(goodsName)', function(data){
+                        var currentGoodsName = data.value;
+                        $("#goodsId").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsName == list.data[i].name){
+                                $('#goodsId').append("<option selected value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }else {
+                                $('#goodsId').append("<option value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    });
+                }else if (category == 'case'){
+                    $.ajax({
+                        url: '/goodsTech/caseList',
+                        dataType: 'json',
+                        type: 'GET',
+                        cache: false,
+                        success: function (data) {
+                            $("#goodsId").empty();//清除原有选项
+                            $("#goodsName").empty();//清除原有选项
+                            for (var i = 0; i < data.data.length; i++) {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                            form.render("select");
+                            list = data;
+                        }
+                    });
+                    //当改变商品id时，连锁改变商品名称
+                    form.on('select(goodsId)', function(data){
+                        var currentGoodsId = data.value;
+                        $("#goodsName").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsId == list.data[i].id){
+                                $('#goodsName').append("<option selected value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }else {
+                                $('#goodsName').append("<option value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    });
+                    //当改变商品名称时，连锁改变商品id
+                    form.on('select(goodsName)', function(data){
+                        var currentGoodsName = data.value;
+                        $("#goodsId").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsName == list.data[i].name){
+                                $('#goodsId').append("<option selected value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }else {
+                                $('#goodsId').append("<option value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>供货商联系人</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+    <script type="text/html" id="indexTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+</head>
+<body>
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-card-body" style="padding: 15px;">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">供货商联系人ID(手机号)</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="id" name="id" th:value="${obj?.id}" autocomplete="off" class="layui-input" maxlength="11" th:readonly="${obj?.id} != null">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="name" th:value="${obj?.name}" lay-verify="required" placeholder="输入名称" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">归属</label>
+                        <div class="layui-input-block">
+                            <select name="belong" id="belong">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">详细信息</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="information" th:value="${obj?.information}" lay-verify="required" placeholder="相关信息" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item layui-hide">
+                        <input type="button" lay-submit lay-filter="LAY-front-submit" id="LAY-front-submit" value="确认">
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/static/layui/layui.js}"></script>
+    <script>
+        layui.use(['form'],function () {
+            var $ = layui.$;
+            var form = layui.form;
+            //当前供应商的值
+            var currentBelong = '[[${obj?.belong}]]';
+            //获取供应商列表
+            $.ajax({
+                url: '/supplier/supplierList',
+                dataType: 'json',
+                type: 'GET',
+                cache: false,
+                success: function (data) {
+                    $('#belong').prepend("<option value=''>请选择</option>");
+                    for (var i = 0; i < data.data.length; i++) {
+                        if (data.data[i].id == currentBelong) {
+                            $('#belong').append("<option selected value='" + data.data[i].id + "'>" + data.data[i].name + "</option>");
+                        } else{
+                            $('#belong').append("<option value='" + data.data[i].id + "'>" + data.data[i].name + "</option>");
+                        }
+                    }
+                    form.render();          //下拉列表渲染，把内容加载进去
+                }
+            });
+
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

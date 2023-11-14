@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>新增硬件</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+    <script type="text/html" id="indexTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+</head>
+<!--<body class="layui-layout-body"> 去掉样式后弹出页面拥有滚动条-->
+<body>
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-card-body" style="padding: 15px;">
+                <form class="layui-form layui-form-pane" action="">
+<!--                    <input name="id" th:value="${obj?.id}" class="layui-input layui-hide">&lt;!&ndash;当使用修改功能时，name为指向数据,th:value="${obj?.}意为收到修改信息&ndash;&gt;-->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">商品ID</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="id" name="id" th:value="${obj?.id}" readonly="readonly" placeholder="自动输入" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="name" th:value="${obj?.name}" lay-verify="required" placeholder="输入名称" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">品牌</label>
+                        <div class="layui-input-block">
+                            <select name="brand" lay-search>
+                                <option th:selected="${obj?.brand eq '三星'}" value="三星">三星</option>
+                                <option th:selected="${obj?.brand eq '西部数据'}" value="西部数据">西部数据</option>
+                                <option th:selected="${obj?.brand eq '闪迪'}" value="闪迪">闪迪</option>
+                                <option th:selected="${obj?.brand eq '东芝'}" value="东芝">东芝</option>
+                                <option th:selected="${obj?.brand eq '英睿达'}" value="英睿达">英睿达</option>
+                                <option th:selected="${obj?.brand eq '影驰'}" value="影驰">影驰</option>
+                                <option th:selected="${obj?.brand eq '爱国者'}" value="爱国者">爱国者</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">容量</label>
+                        <div class="layui-input-block">
+                            <select name="volume">
+                                <option th:selected="${obj?.volume eq 2048}" value="2048">2TB</option>
+                                <option th:selected="${obj?.volume eq 1024}" value="1024">1TB</option>
+                                <option th:selected="${obj?.volume eq 512}" value="512">512GB</option>
+                                <option th:selected="${obj?.volume eq 256}" value="256">256GB</option>
+
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">接口</label>
+                        <div class="layui-input-block">
+                            <select name="slot">
+                                <option th:selected="${obj?.slot eq 'M.2 SATA'}" value="M.2 SATA">M.2 SATA</option>
+                                <option th:selected="${obj?.slot eq 'M.2 PCIe'}" value="M.2 PCIe">M.2 PCIe</option>
+                                <option th:selected="${obj?.slot eq 'SATA3'}" value="SATA3">SATA3</option>
+                                <option th:selected="${obj?.slot eq 'SATA2'}" value="SATA2">SATA2</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">闪存架构</label>
+                        <div class="layui-input-block">
+                            <select name="structure">
+                                <option th:selected="${obj?.structure eq 'QLC四层单元'}" value="QLC四层单元">QLC四层单元</option>
+                                <option th:selected="${obj?.structure eq 'MLC多层单元'}" value="MLC多层单元">MLC多层单元</option>
+                                <option th:selected="${obj?.structure eq 'TLC三层单元'}" value="TLC三层单元">TLC三层单元</option>
+                                <option th:selected="${obj?.structure eq 'SLC单层单元'}" value="SLC单层单元">SLC单层单元</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">性能跑分</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="performance" th:value="${obj?.performance}" lay-verify="required" placeholder="输入跑分" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+
+<!--                    弹出隐藏式再次确认按钮-->
+                    <!--竟然会影响添加功能-->
+                    <div class="layui-form-item layui-hide">
+                        <input type="button" lay-submit lay-filter="LAY-front-submit" id="LAY-front-submit" value="确认">
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/static/layui/layui.js}"></script>
+    <script>
+        layui.use(['form'],function () {
+            var $ = layui.$;
+
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

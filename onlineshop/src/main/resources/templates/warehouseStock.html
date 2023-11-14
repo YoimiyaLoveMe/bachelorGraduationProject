@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>新增硬件</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+    <script type="text/html" id="indexTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+</head>
+<body>
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-card-body" style="padding: 15px;">
+                <table class="layui-table" lay-filter="demo">
+                    <thead>
+                    <tr>
+                        <th lay-data="{field:'goodsid',align: 'center', width:150, sort:true}">商品编号</th>
+                        <th lay-data="{field:'category',align: 'center', width:150}">商品类别</th>
+                        <th lay-data="{field:'name', align: 'center', width:300}">商品名称</th>
+                        <th lay-data="{field:'stock', align: 'center', width:150, sort:true}">当前库存</th>
+                    </tr>
+                    </thead>
+                    <tbody id="stock">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/static/layui/layui.js}"></script>
+    <script>
+        layui.use(['form','table'],function () {
+            var $ = layui.$;
+            var table = layui.table;
+            // 错误日志 2022.4.20
+            // 无法输出指定数据
+            // 分析：前端ajax要求以json格式返回数据，而后端返回Set<Tuple>类型数据，此时实际接收的数据与对象类型的json数据不同
+            // 由于Set<Tuple>类型非常特殊，实际返回的数据会自动添加序号，类似于数组中包含实际tuple的json数据，因此在遍历data取出数据时不是data.data[i].*而是data[i].*,同时,遍历长度也直接是data.length
+            //总而言之：此情形中data是一个数组，数组中是json
+            $.ajax({
+                url: '/warehouse/getStockInfo?id='+ [[${id}]],
+                dataType: 'json',
+                type: 'POST',
+                cache: false,
+                success: function (data) {
+                    //动态生成静态表格
+                    for(var i = 0; i < data.length; i++) {
+                        var category = null;
+                        switch (data[i].category){
+                            case "motherboard":
+                                category = "主板";
+                                break;
+                            case "cpu":
+                                category = "芯片";
+                                break;
+                            case "graphicscard":
+                                category = "显卡";
+                                break;
+                            case "ram":
+                                category = "内存";
+                                break;
+                            case "ssd":
+                                category = "硬盘";
+                                break;
+                            case "heatsink":
+                                category = "散热器";
+                                break;
+                            case "power":
+                                category = "电源";
+                                break;
+                            case "case":
+                                category = "机箱";
+                                break;
+                            default: return null;
+                        }
+                        $('#stock').append("<tr><td>"+data[i].id+"</td><td>"+category+"</td><td>"+data[i].name+"</td><td>"+data[i].stock+"</td></tr>");
+                    }
+                    //layui表格模块重新渲染
+                    table.init('demo', {
+                        height: 300, //表格高度
+                        limit: 5 , //每页显示数据量
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

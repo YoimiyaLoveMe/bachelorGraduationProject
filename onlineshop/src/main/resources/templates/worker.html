@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>员工表</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/html" id="indexTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+</head>
+<body class="layui-layout-body">
+    <div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header"></div>
+                    <div class="layui-card-body">
+                        <table class="layui-hide" id="main-table" lay-filter="main-table"></table>
+                        <script type="text/html" id="toolbarDemo">
+                            <!--添加-->
+                            <span class="layui-inline" lay-event="add"><i class="layui-icon">&#xe654;</i> </span>
+                            <!--查询-->
+                            <span class="layui-inline" style="width: 240px;">
+                                <input class="layui-input" name="param" id="param" placeholder="员工名称查询" autocomplete="off">
+                            </span>
+                            <span class="layui-btn layui-btn-sm layui-bg-red" lay-event="querySearch">
+                                <i class="layui-icon">&#xe615;</i>查询
+                            </span>
+                        </script>
+
+                        <script type="text/html" id="barDemo">
+                            <a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>
+                            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                        </script>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/static/layui/layui.js}"></script>
+    <script>
+        layui.use(['table','form'],function () {
+            var $ = layui.$;
+            var table = layui.table;
+            //定义当前页面表格
+            table.render({
+                elem: '#main-table',
+                height: 650,
+                url: '/worker/workerQueryPage',
+                method: 'POST',
+                page: true,
+                id: 'table-load',
+                toolbar: '#toolbarDemo',
+                cols: [
+                    [
+                        {field: 'id', title: '员工ID(手机号)', align: 'center',},
+                        {field: 'name', title: '姓名', align: 'center'},
+                        {field: 'idCard', title: '身份证号码', align: 'center'},
+                        {field: 'sex', title: '性别', align: 'center'},
+                        {field: 'department', title: '部门', align: 'center'},
+                        {field: 'job', title: '职位', align: 'center',
+                            templet:function (data){
+                                var job = null;
+                                // 报错信息：前台：请求url为http://localhost:8080/worker/jobGetById?id=3&_=1649929218513，http状态码为500，
+                                // 后台：template might not exist or might not be accessible by any of the configured Template Resolvers
+                                // 传输对象出现意外的参数
+                                // 问题解决：仅获取数据时controller层忘加@ResponseBody注解
+                                $.ajax({
+                                    url: '/job/jobGetById',
+                                    type: 'POST',
+                                    data: {
+                                        id: data.job
+                                    },
+                                    async: false,
+                                    cache: false,
+                                    success: function (obj) {
+                                        job = obj.name;
+                                    },
+                                    error: function (){
+                                        job = "数据丢失";
+                                    }
+                                })
+                                return job;
+                                // 报错信息：数据交互正常，但前端表格中依旧显示undefined
+                                // 查明原因：使用ajax请求数据，success函数中使用return对templet无效
+                                // 问题解决：应当先在外部定义变量，通过ajax请求数据后在success中为该变量赋值，即可值传递出ajax后在templet中return
+                            }
+                        },
+                        {field: 'working', title: '工作状态', align: 'center',
+                            templet:function (line){
+                                if (line.working == 1 ){
+                                    return "在岗";
+                                }else if(line.working == 0){
+                                    return "休息";
+                                }
+                            }},
+                        {title: '操作', align: 'center', toolbar: '#barDemo', fixed: 'right'},//fixed:'right':靠右顶格
+                    ]
+                ]
+            });
+            //监听头工具栏事件（添加，查询）
+            table.on('toolbar(main-table)', function (obj) {
+                switch (obj.event) {
+                    //添加
+                    case 'add':
+                        layer.open({
+                            type: 2,
+                            title: '员工入职',
+                            content: 'worker/register',
+                            shade: [0.8, '#393d49'],
+                            area: ['600px', '600px'],
+                            btn: ['提交', '取消'],
+                            yes: function (index, layero) {
+                                var iframeWindow = window['layui-layer-iframe' + index];
+                                var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                //监听提交
+                                iframeWindow.layui.form.on('submit(LAY-front-submit)', function (data) {
+                                    var field = data.field;
+                                    $.ajax({
+                                        url: '/worker/workerAdd',
+                                        data: field,
+                                        async: false,//是否异步
+                                        cache: false,//缓存
+                                        success: function (str) {
+                                            if (str.code === 0) {
+                                                table.reload('table-load');
+                                            }
+                                            layer.msg(str.msg, {icon: str.icon, anim: str.anim});
+                                        }
+                                    });
+                                    layer.close(index);//关闭弹窗
+                                });
+                                submit.trigger('click');
+                            },
+                            success: function (layero, index) {
+                            }
+                        });
+                        break;
+
+                    //查询
+                    case 'querySearch':
+                        var param = $('#param').val();
+                        table.reload('table-load', {
+                            where: {
+                                param: param
+                            }
+                        });
+                        $('#param').val(param);
+                        break;
+                }
+            });
+            // //监听修改和删除功能
+            table.on('tool(main-table)',function (obj) {
+                var data = obj.data;
+                switch (obj.event) {
+                    case 'edit':
+                        layer.open({
+                            type: 2,
+                            title: '人员变动',
+                            content: '/worker/workerQueryById?id=' +data.id,
+                            shade:[0.8,'#393d49'],
+                            area:['600px','650px'],
+                            btn:['确定','取消'],
+                            yes:function (index,layero) {
+                                var iframeWindow = window['layui-layer-iframe'+index];
+                                var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                //监听提交
+                                iframeWindow.layui.form.on('submit(LAY-front-submit)',function (data) {
+                                    var field = data.field;
+                                    $.ajax({
+                                        url: '/worker/workerEdit',
+                                        data: field,
+                                        async: false,
+                                        cache: false,
+                                        success: function (str) {
+                                            if(str.code === 0){
+                                                table.reload('table-load');
+                                            }
+                                            layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                        }
+                                    });
+                                    layer.close(index);     //关闭弹层
+                                });
+                                submit.trigger('click');
+                            },
+                            success:function (layero,index) {
+
+                            }
+                        });
+                        break;
+                    case 'del':
+                        layer.confirm('确认删除？',function (index) {
+                            $.ajax({
+                                url: '/worker/workerDelById?id=' +data.id,
+                                data: null,
+                                async: false,
+                                cache: false,
+                                success: function (str) {
+                                    table.reload('table-load');
+                                    layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                }
+                            });
+                        })
+                        break;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

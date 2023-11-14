@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>新增硬件</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+    <script type="text/html" id="indexTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+</head>
+<!--<body class="layui-layout-body"> 去掉样式后弹出页面拥有滚动条-->
+<body>
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-card-body" style="padding: 15px;">
+                <form class="layui-form layui-form-pane" action="">
+<!--                    <input name="id" th:value="${obj?.id}" class="layui-input layui-hide">&lt;!&ndash;当使用修改功能时，name为指向数据,th:value="${obj?.}意为收到修改信息&ndash;&gt;-->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">商品ID</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="id" name="id" th:value="${obj?.id}" readonly="readonly" placeholder="自动输入" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="name" th:value="${obj?.name}" lay-verify="required" placeholder="输入名称" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">品牌</label>
+                        <div class="layui-input-block">
+                            <select name="brand">
+                                <option th:selected="${obj?.brand eq 'Intel'}" value="Intel">Intel</option>
+                                <option th:selected="${obj?.brand eq 'AMD'}" value="AMD">AMD</option>
+                                <option th:selected="${obj?.brand eq '龙芯'}" value="龙芯">龙芯</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">系列</label>
+                        <div class="layui-input-block">
+                            <select name="series" lay-search>
+                                <option th:selected="${obj?.series eq '酷睿i9'}" value="酷睿i9">酷睿i9</option>
+                                <option th:selected="${obj?.series eq '酷睿i7'}" value="酷睿i7">酷睿i7</option>
+                                <option th:selected="${obj?.series eq '酷睿i5'}" value="酷睿i5">酷睿i5</option>
+                                <option th:selected="${obj?.series eq '酷睿i3'}" value="酷睿i3">酷睿i3</option>
+                                <option th:selected="${obj?.series eq 'Ryzen9'}" value="Ryzen9">Ryzen9</option>
+                                <option th:selected="${obj?.series eq 'Ryzen7'}" value="Ryzen7">Ryzen7</option>
+                                <option th:selected="${obj?.series eq 'Ryzen5'}" value="Ryzen5">Ryzen5</option>
+                                <option th:selected="${obj?.series eq 'Ryzen3'}" value="Ryzen3">Ryzen3</option>
+                                <option th:selected="${obj?.series eq '奔腾'}" value="奔腾">奔腾</option>
+                                <option th:selected="${obj?.series eq '赛扬'}" value="赛扬">赛扬</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">核心数量</label>
+                        <div class="layui-input-block">
+                            <select name="coreNumber">
+                                <option th:selected="${obj?.coreNumber eq 32}" value="32">三十二核心</option>
+                                <option th:selected="${obj?.coreNumber eq 24}" value="24">二十四核心</option>
+                                <option th:selected="${obj?.coreNumber eq 16}" value="16">十六核心</option>
+                                <option th:selected="${obj?.coreNumber eq 12}" value="12">十二核心</option>
+                                <option th:selected="${obj?.coreNumber eq 10}" value="10">十核心</option>
+                                <option th:selected="${obj?.coreNumber eq 8}" value="8">八核心</option>
+                                <option th:selected="${obj?.coreNumber eq 6}" value="6">六核心</option>
+                                <option th:selected="${obj?.coreNumber eq 4}" value="4">四核心</option>
+                                <option th:selected="${obj?.coreNumber eq 2}" value="2">双核心</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">线程数量</label>
+                        <div class="layui-input-block">
+                            <select name="threadNumber">
+                                <option th:selected="${obj?.threadNumber eq 32}" value="32">三十二线程</option>
+                                <option th:selected="${obj?.threadNumber eq 24}" value="24">二十四线程</option>
+                                <option th:selected="${obj?.threadNumber eq 20}" value="20">二十线程</option>
+                                <option th:selected="${obj?.threadNumber eq 16}" value="16">十六线程</option>
+                                <option th:selected="${obj?.threadNumber eq 12}" value="12">十二线程</option>
+                                <option th:selected="${obj?.threadNumber eq 8}" value="8">八线程</option>
+                                <option th:selected="${obj?.threadNumber eq 4}" value="4">四线程</option>
+                                <option th:selected="${obj?.threadNumber eq 2}" value="2">双线程</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">插槽类型</label>
+                        <div class="layui-input-block">
+                            <select name="slot" lay-search>
+                                <option th:selected="${obj?.slot eq 'LGA 1200'}" value="LGA 1200">LGA 1200</option>
+                                <option th:selected="${obj?.slot eq 'LGA 1700'}" value="LGA 1700">LGA 1700</option>
+                                <option th:selected="${obj?.slot eq 'LGA 2066'}" value="LGA 2066">LGA 2066</option>
+                                <option th:selected="${obj?.slot eq 'Socket AM3'}" value="Socket AM3">Socket AM3</option>
+                                <option th:selected="${obj?.slot eq 'Socket AM3+'}" value="Socket AM3+">Socket AM3+</option>
+                                <option th:selected="${obj?.slot eq 'Socket AM4'}" value="Socket AM4">Socket AM4</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">制作工艺</label>
+                        <div class="layui-input-block">
+                            <select name="accuracy">
+                                <option th:selected="${obj?.accuracy eq 7}" value="7">7纳米</option>
+                                <option th:selected="${obj?.accuracy eq 10}" value="10">10纳米</option>
+                                <option th:selected="${obj?.accuracy eq 12}" value="12">12纳米</option>
+                                <option th:selected="${obj?.accuracy eq 14}" value="14">14纳米</option>
+                                <option th:selected="${obj?.accuracy eq 22}" value="22">22纳米</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">核心代号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="coreCord" th:value="${obj?.coreCord}" lay-verify="required" placeholder="输入核心代号" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">CPU架构</label>
+                        <div class="layui-input-block">
+                            <select name="structure">
+                                <option th:selected="${obj?.structure eq 'X86'}" value="X86">X86</option>
+                                <option th:selected="${obj?.structure eq 'ARM'}" value="ARM">ARM</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">主频</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="basicFrequency" th:value="${obj?.basicFrequency}" lay-verify="required" placeholder="输入主频(GHz)" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">最高睿频</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="turbo" th:value="${obj?.turbo}" placeholder="输入最高睿频(无则不填)" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">热设计功耗</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="tdp" th:value="${obj?.tdp}" lay-verify="required" placeholder="数值(W)" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">最大加速功耗</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="mtp" th:value="${obj?.mtp}" lay-verify="required" placeholder="数值(W)" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">支持最大内存</label>
+                        <div class="layui-input-block">
+                            <select name="memoryVolume">
+                                <option th:selected="${obj?.memoryVolume eq 256}" value="256">256GB</option>
+                                <option th:selected="${obj?.memoryVolume eq 128}" value="128">128GB</option>
+                                <option th:selected="${obj?.memoryVolume eq 64}" value="64">64GB</option>
+                                <option th:selected="${obj?.memoryVolume eq 32}" value="32">32GB</option>
+                                <option th:selected="${obj?.memoryVolume eq 16}" value="16">16GB</option>
+                                <option th:selected="${obj?.memoryVolume eq 8}" value="8">8GB</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">内存类型</label>
+                        <div class="layui-input-block">
+                            <select name="memoryType">
+                                <option th:selected="${obj?.memoryType eq 'DDR5'}" value="DDR5">DDR5</option>
+                                <option th:selected="${obj?.memoryType eq 'DDR4'}" value="DDR4">DDR4</option>
+                                <option th:selected="${obj?.memoryType eq 'DDR3'}" value="DDR3">DDR3</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">最大内存通道数</label>
+                        <div class="layui-input-block">
+                            <select name="memoryChannel">
+                                <option th:selected="${obj?.memoryChannel eq 1}" value="1">1</option>
+                                <option th:selected="${obj?.memoryChannel eq 2}" value="2">2</option>
+                                <option th:selected="${obj?.memoryChannel eq 4}" value="4">4</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">PCI-E标准</label>
+                        <div class="layui-input-block">
+                            <select name="pciE">
+                                <option th:selected="${obj?.pciE eq 5}" value="5.0">PCI-E 5.0</option>
+                                <option th:selected="${obj?.pciE eq 4}" value="4.0">PCI-E 4.0</option>
+                                <option th:selected="${obj?.pciE eq 3}" value="3.0">PCI-E 3.0</option>
+                                <option th:selected="${obj?.pciE eq 2}" value="2.0">PCI-E 2.0</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">集成显卡</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="integratedCpu" th:value="${obj?.integratedCpu}" placeholder="输入集成显卡型号(无则不填)" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">性能跑分</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="performance" th:value="${obj?.performance}" lay-verify="required" placeholder="输入跑分" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+<!--                    弹出隐藏式再次确认按钮-->
+                    <!--竟然会影响添加功能-->
+                    <div class="layui-form-item layui-hide">
+                        <input type="button" lay-submit lay-filter="LAY-front-submit" id="LAY-front-submit" value="确认">
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/static/layui/layui.js}"></script>
+    <script>
+        layui.use(['form'],function () {
+            var $ = layui.$;
+
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

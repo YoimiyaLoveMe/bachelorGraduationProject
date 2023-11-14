@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>制定采购单</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+    <script type="text/html" id="indexTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+</head>
+<!--<body class="layui-layout-body"> 去掉样式后弹出页面拥有滚动条-->
+<body>
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-card-body" style="padding: 15px;">
+                <form class="layui-form layui-form-pane" action="">
+<!--                    <input name="id" th:value="${obj?.id}" class="layui-input layui-hide">&lt;!&ndash;当使用修改功能时，name为指向数据,th:value="${obj?.}意为收到修改信息&ndash;&gt;-->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">采购单编号</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="id" name="id" readonly="readonly" placeholder="自动生成" autocomplete="off" class="layui-input" th:value="${obj?.id}">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">商品类别</label>
+                        <div class="layui-input-block">
+                            <select name="category" id="category" lay-filter="category" lay-search>
+                                <option value=''>请选择</option>
+                                <option value="motherboard" th:selected="${obj?.category eq 'motherboard'}">主板</option>
+                                <option value="cpu" th:selected="${obj?.category eq 'cpu'}">芯片</option>
+                                <option value="graphicscard" th:selected="${obj?.category eq 'graphicscard'}">显卡</option>
+                                <option value="ram" th:selected="${obj?.category eq 'ram'}">内存</option>
+                                <option value="ssd" th:selected="${obj?.category eq 'ssd'}">硬盘</option>
+                                <option value="heatsink" th:selected="${obj?.category eq 'heatsink'}">散热器</option>
+                                <option value="power" th:selected="${obj?.category eq 'power'}">电源</option>
+                                <option value="case" th:selected="${obj?.category eq 'case'}">机箱</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">商品编号</label>
+                        <div class="layui-input-block">
+                            <select name="goodsId" id="goodsId" lay-filter="goodsId" lay-search>
+                                <option value=''>请先选择商品类别</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">商品名称</label>
+                        <div class="layui-input-block">
+                            <select name="goodsName" id="goodsName" lay-filter="goodsName" lay-search>
+                                <option value=''>请先选择商品类别</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">供货项编号</label>
+                        <div class="layui-input-block">
+                            <select name="supplyId" id="supplyId" lay-filter="supplyId" lay-search>
+                                <option value=''>请先选择商品类别</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">供货商编号</label>
+                        <div class="layui-input-block">
+                            <select name="supplierId" id="supplierId" lay-filter="supplierId" lay-search>
+                                <option value=''>请先选择商品类别</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">供货商名称</label>
+                        <div class="layui-input-block">
+                            <select name="supplierName" id="supplierName" lay-filter="supplierName" lay-search>
+                                <option value=''>请先选择商品类别</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">单价</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="price" name="price" autocomplete="off" class="layui-input" readonly="readonly" th:value="${obj?.price}">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">数量</label>
+                        <div class="layui-input-block">
+                            <input type="number" id="number" name="number" autocomplete="off" class="layui-input" th:value="${obj?.number}">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item layui-hide">
+                        <label class="layui-form-label">总价</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="sumPrice" name="sumPrice" autocomplete="off" class="layui-input" readonly="readonly">
+                        </div>
+                    </div>
+
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">备注信息</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="information" name="information" autocomplete="off" class="layui-input" th:value="${obj?.information}">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item layui-hide">
+                        <label class="layui-form-label">状态</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="state" name="state" autocomplete="off" class="layui-input" th:value="${obj?.state}">
+                        </div>
+                    </div>
+
+<!--                    弹出隐藏式再次确认按钮-->
+                    <!--竟然会影响添加功能-->
+                    <div class="layui-form-item layui-hide">
+                        <input type="button" lay-submit lay-filter="LAY-front-submit" id="LAY-front-submit" value="确认">
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/static/layui/layui.js}"></script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+
+    <!--错误日志 2022.4.23-->
+    <!--修改功能正常，添加功能异常，页面错误，status 500-->
+    <!--thymeleaf解析错误 ： An error happened during template parsing (template: "class path resource [templates//purchasePage.html]") -->
+    <!--问题解决：obj.* 改为 obj.?* -->
+    <!--结论：未加?时，添加页面thymeleaf无法获取obj导致错误，?存在则允许obj为空-->
+
+    <script>
+        $(document).ready(function (){
+            if([[${obj?.id}]] != null){
+                $("#goodsId").empty();//清除原有选项
+                $("#goodsName").empty();//清除原有选项
+                $("#supplyId").empty();//清除原有选项
+                $("#supplierId").empty();//清除原有选项
+                $("#supplierName").empty();//清除原有选项
+                $('#goodsId').append("<option th:value='${obj?.goodsId}'>[[${obj?.goodsId}]]</option>");
+                $('#goodsName').append("<option th:value='${obj?.goodsName}'>[[${obj?.goodsName}]]</option>");
+                $('#supplyId').append("<option th:value='${obj?.supplyId}'>[[${obj?.supplyId}]]</option>");
+                $('#supplierId').append("<option th:value='${obj?.supplierId}'>[[${obj?.supplierId}]]</option>");
+                $('#supplierName').append("<option th:value='${obj?.supplierName}'>[[${obj?.supplierName}]]</option>");
+            }
+        })
+    </script>
+
+    <!--商品信息连锁-->
+    <script>
+        layui.use(['form'],function () {
+            var $ = layui.$;
+            var form = layui.form;
+            //当改变商品种类时，连锁改变商品id和商品名称选择列表
+            form.on('select(category)', function(data){
+                $("#supplyId").empty();//清除原有选项
+                $("#supplierId").empty();//清除原有选项
+                $("#supplierName").empty();//清除原有选项
+                $('#supplyId').append("<option value=''>请先选择商品</option>");
+                $('#supplierId').append("<option value=''>请先选择商品</option>");
+                $('#supplierName').append("<option value=''>请先选择商品</option>");
+                var category = data.value;
+                var list = null;
+                if(category == 'motherboard'){
+                    $.ajax({
+                        url: '/goodsTech/motherboardList',
+                        dataType: 'json',
+                        type: 'GET',
+                        cache: false,
+                        success: function (data) {
+                            $("#goodsId").empty();//清除原有选项
+                            $("#goodsName").empty();//清除原有选项
+                            $('#goodsId').append("<option value=''>请选择</option>");
+                            $('#goodsName').append("<option value=''>请选择</option>");
+                            for (var i = 0; i < data.data.length; i++) {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                            form.render("select");
+                            list = data;
+                        }
+                    });
+                    //当改变商品id时，连锁改变商品名称和供货信息
+                    form.on('select(goodsId)', function(data){
+                        var currentGoodsId = data.value;
+                        $("#goodsName").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsId == list.data[i].id){
+                                $('#goodsName').append("<option selected value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }else {
+                                $('#goodsName').append("<option value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }
+                        }
+                        //连锁获取对应商品的供货项
+                        $.ajax({
+                            url: '/supply/supplyList',
+                            dataType: 'json',
+                            type: 'GET',
+                            cache: false,
+                            success: function (data) {
+                                $("#supplyId").empty();//清除原有选项
+                                $("#supplierId").empty();//清除原有选项
+                                $("#supplierName").empty();//清除原有选项
+                                for (var i = 0; i < data.data.length; i++) {
+                                    if(currentGoodsId == data.data[i].goodsId){
+                                        $('#supplyId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                        $('#supplierId').append("<option value='" + data.data[i].supplierId + "'>" + data.data[i].supplierId + "</option>");
+                                        $('#supplierName').append("<option value='" + data.data[i].supplierName + "'>" + data.data[i].supplierName + "</option>");
+                                    }
+                                }
+                                form.render("select");
+                            }
+                        });
+                        form.render("select");
+                    });
+                    //当改变商品名称时，连锁改变商品id
+                    form.on('select(goodsName)', function(data){
+                        var currentGoodsName = data.value;
+                        $("#goodsId").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsName == list.data[i].name){
+                                $('#goodsId').append("<option selected value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }else {
+                                $('#goodsId').append("<option value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }
+                        }
+                        //连锁获得对应商品的供货项
+                        $.ajax({
+                            url: '/supply/supplyList',
+                            dataType: 'json',
+                            type: 'GET',
+                            cache: false,
+                            success: function (data) {
+                                $("#supplyId").empty();//清除原有选项
+                                $("#supplierId").empty();//清除原有选项
+                                $("#supplierName").empty();//清除原有选项
+                                for (var i = 0; i < data.data.length; i++) {
+                                    if(currentGoodsName == data.data[i].goodsName){
+                                        $('#supplyId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                        $('#supplierId').append("<option value='" + data.data[i].supplierId + "'>" + data.data[i].supplierId + "</option>");
+                                        $('#supplierName').append("<option value='" + data.data[i].supplierName + "'>" + data.data[i].supplierName + "</option>");
+                                    }
+                                }
+                                form.render("select");
+                            }
+                        });
+                        form.render("select");
+                    });
+                }else if (category == 'cpu'){
+                    $.ajax({
+                        url: '/goodsTech/cpuList',
+                        dataType: 'json',
+                        type: 'GET',
+                        cache: false,
+                        success: function (data) {
+                            $("#goodsId").empty();//清除原有选项
+                            $("#goodsName").empty();//清除原有选项
+                            $('#goodsId').append("<option value=''>请选择</option>");
+                            $('#goodsName').append("<option value=''>请选择</option>");
+                            for (var i = 0; i < data.data.length; i++) {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                            form.render("select");
+                            list = data;
+                        }
+                    });
+                    //当改变商品id时，连锁改变商品名称
+                    form.on('select(goodsId)', function(data){
+                        var currentGoodsId = data.value;
+                        $("#goodsName").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsId == list.data[i].id){
+                                $('#goodsName').append("<option selected value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }else {
+                                $('#goodsName').append("<option value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }
+                        }
+                        //连锁获取对应商品的供货项
+                        $.ajax({
+                            url: '/supply/supplyList',
+                            dataType: 'json',
+                            type: 'GET',
+                            cache: false,
+                            success: function (data) {
+                                $("#supplyId").empty();//清除原有选项
+                                $("#supplierId").empty();//清除原有选项
+                                $("#supplierName").empty();//清除原有选项
+                                for (var i = 0; i < data.data.length; i++) {
+                                    if(currentGoodsId == data.data[i].goodsId){
+                                        $('#supplyId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                        $('#supplierId').append("<option value='" + data.data[i].supplierId + "'>" + data.data[i].supplierId + "</option>");
+                                        $('#supplierName').append("<option value='" + data.data[i].supplierName + "'>" + data.data[i].supplierName + "</option>");
+                                    }
+                                }
+                                form.render("select");
+                            }
+                        });
+                        form.render("select");
+                    });
+                    //当改变商品名称时，连锁改变商品id
+                    form.on('select(goodsName)', function(data){
+                        var currentGoodsName = data.value;
+                        $("#goodsId").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsName == list.data[i].name){
+                                $('#goodsId').append("<option selected value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }else {
+                                $('#goodsId').append("<option value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }
+                        }
+                        //连锁获得对应商品的供货项
+                        $.ajax({
+                            url: '/supply/supplyList',
+                            dataType: 'json',
+                            type: 'GET',
+                            cache: false,
+                            success: function (data) {
+                                $("#supplyId").empty();//清除原有选项
+                                $("#supplierId").empty();//清除原有选项
+                                $("#supplierName").empty();//清除原有选项
+                                for (var i = 0; i < data.data.length; i++) {
+                                    if(currentGoodsName == data.data[i].goodsName){
+                                        $('#supplyId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                        $('#supplierId').append("<option value='" + data.data[i].supplierId + "'>" + data.data[i].supplierId + "</option>");
+                                        $('#supplierName').append("<option value='" + data.data[i].supplierName + "'>" + data.data[i].supplierName + "</option>");
+                                    }
+                                }
+                                form.render("select");
+                            }
+                        });
+                        form.render("select");
+                    });
+                }else if (category == 'graphicscard'){
+                    $.ajax({
+                        url: '/goodsTech/graphicscardList',
+                        dataType: 'json',
+                        type: 'GET',
+                        cache: false,
+                        success: function (data) {
+                            $("#goodsId").empty();//清除原有选项
+                            $("#goodsName").empty();//清除原有选项
+                            $('#goodsId').append("<option value=''>请选择</option>");
+                            $('#goodsName').append("<option value=''>请选择</option>");
+                            for (var i = 0; i < data.data.length; i++) {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                            form.render("select");
+                            list = data;
+                        }
+                    });
+                    //当改变商品id时，连锁改变商品名称
+                    form.on('select(goodsId)', function(data){
+                        var currentGoodsId = data.value;
+                        $("#goodsName").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsId == list.data[i].id){
+                                $('#goodsName').append("<option selected value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }else {
+                                $('#goodsName').append("<option value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }
+                        }
+                        //连锁获取对应商品的供货项
+                        $.ajax({
+                            url: '/supply/supplyList',
+                            dataType: 'json',
+                            type: 'GET',
+                            cache: false,
+                            success: function (data) {
+                                $("#supplyId").empty();//清除原有选项
+                                $("#supplierId").empty();//清除原有选项
+                                $("#supplierName").empty();//清除原有选项
+                                for (var i = 0; i < data.data.length; i++) {
+                                    if(currentGoodsId == data.data[i].goodsId){
+                                        $('#supplyId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                        $('#supplierId').append("<option value='" + data.data[i].supplierId + "'>" + data.data[i].supplierId + "</option>");
+                                        $('#supplierName').append("<option value='" + data.data[i].supplierName + "'>" + data.data[i].supplierName + "</option>");
+                                    }
+                                }
+                                form.render("select");
+                            }
+                        });
+                        form.render("select");
+                    });
+                    //当改变商品名称时，连锁改变商品id
+                    form.on('select(goodsName)', function(data){
+                        var currentGoodsName = data.value;
+                        $("#goodsId").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsName == list.data[i].name){
+                                $('#goodsId').append("<option selected value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }else {
+                                $('#goodsId').append("<option value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }
+                        }
+                        //连锁获得对应商品的供货项
+                        $.ajax({
+                            url: '/supply/supplyList',
+                            dataType: 'json',
+                            type: 'GET',
+                            cache: false,
+                            success: function (data) {
+                                $("#supplyId").empty();//清除原有选项
+                                $("#supplierId").empty();//清除原有选项
+                                $("#supplierName").empty();//清除原有选项
+                                for (var i = 0; i < data.data.length; i++) {
+                                    if(currentGoodsName == data.data[i].goodsName){
+                                        $('#supplyId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                        $('#supplierId').append("<option value='" + data.data[i].supplierId + "'>" + data.data[i].supplierId + "</option>");
+                                        $('#supplierName').append("<option value='" + data.data[i].supplierName + "'>" + data.data[i].supplierName + "</option>");
+                                    }
+                                }
+                                form.render("select");
+                            }
+                        });
+                        form.render("select");
+                    });
+                }else if (category == 'ram'){
+                    $.ajax({
+                        url: '/goodsTech/ramList',
+                        dataType: 'json',
+                        type: 'GET',
+                        cache: false,
+                        success: function (data) {
+                            $("#goodsId").empty();//清除原有选项
+                            $("#goodsName").empty();//清除原有选项
+                            $('#goodsId').append("<option value=''>请选择</option>");
+                            $('#goodsName').append("<option value=''>请选择</option>");
+                            for (var i = 0; i < data.data.length; i++) {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                            form.render("select");
+                            list = data;
+                        }
+                    });
+                    //当改变商品id时，连锁改变商品名称
+                    form.on('select(goodsId)', function(data){
+                        var currentGoodsId = data.value;
+                        $("#goodsName").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsId == list.data[i].id){
+                                $('#goodsName').append("<option selected value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }else {
+                                $('#goodsName').append("<option value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }
+                        }
+                        //连锁获取对应商品的供货项
+                        $.ajax({
+                            url: '/supply/supplyList',
+                            dataType: 'json',
+                            type: 'GET',
+                            cache: false,
+                            success: function (data) {
+                                $("#supplyId").empty();//清除原有选项
+                                $("#supplierId").empty();//清除原有选项
+                                $("#supplierName").empty();//清除原有选项
+                                for (var i = 0; i < data.data.length; i++) {
+                                    if(currentGoodsId == data.data[i].goodsId){
+                                        $('#supplyId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                        $('#supplierId').append("<option value='" + data.data[i].supplierId + "'>" + data.data[i].supplierId + "</option>");
+                                        $('#supplierName').append("<option value='" + data.data[i].supplierName + "'>" + data.data[i].supplierName + "</option>");
+                                    }
+                                }
+                                form.render("select");
+                            }
+                        });
+                        form.render("select");
+                    });
+                    //当改变商品名称时，连锁改变商品id
+                    form.on('select(goodsName)', function(data){
+                        var currentGoodsName = data.value;
+                        $("#goodsId").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsName == list.data[i].name){
+                                $('#goodsId').append("<option selected value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }else {
+                                $('#goodsId').append("<option value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }
+                        }
+                        //连锁获得对应商品的供货项
+                        $.ajax({
+                            url: '/supply/supplyList',
+                            dataType: 'json',
+                            type: 'GET',
+                            cache: false,
+                            success: function (data) {
+                                $("#supplyId").empty();//清除原有选项
+                                $("#supplierId").empty();//清除原有选项
+                                $("#supplierName").empty();//清除原有选项
+                                for (var i = 0; i < data.data.length; i++) {
+                                    if(currentGoodsName == data.data[i].goodsName){
+                                        $('#supplyId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                        $('#supplierId').append("<option value='" + data.data[i].supplierId + "'>" + data.data[i].supplierId + "</option>");
+                                        $('#supplierName').append("<option value='" + data.data[i].supplierName + "'>" + data.data[i].supplierName + "</option>");
+                                    }
+                                }
+                                form.render("select");
+                            }
+                        });
+                        form.render("select");
+                    });
+                }else if (category == 'ssd'){
+                    $.ajax({
+                        url: '/goodsTech/ssdList',
+                        dataType: 'json',
+                        type: 'GET',
+                        cache: false,
+                        success: function (data) {
+                            $("#goodsId").empty();//清除原有选项
+                            $("#goodsName").empty();//清除原有选项
+                            $('#goodsId').append("<option value=''>请选择</option>");
+                            $('#goodsName').append("<option value=''>请选择</option>");
+                            for (var i = 0; i < data.data.length; i++) {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                            form.render("select");
+                            list = data;
+                        }
+                    });
+                    //当改变商品id时，连锁改变商品名称
+                    form.on('select(goodsId)', function(data){
+                        var currentGoodsId = data.value;
+                        $("#goodsName").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsId == list.data[i].id){
+                                $('#goodsName').append("<option selected value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }else {
+                                $('#goodsName').append("<option value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }
+                        }
+                        //连锁获取对应商品的供货项
+                        $.ajax({
+                            url: '/supply/supplyList',
+                            dataType: 'json',
+                            type: 'GET',
+                            cache: false,
+                            success: function (data) {
+                                $("#supplyId").empty();//清除原有选项
+                                $("#supplierId").empty();//清除原有选项
+                                $("#supplierName").empty();//清除原有选项
+                                for (var i = 0; i < data.data.length; i++) {
+                                    if(currentGoodsId == data.data[i].goodsId){
+                                        $('#supplyId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                        $('#supplierId').append("<option value='" + data.data[i].supplierId + "'>" + data.data[i].supplierId + "</option>");
+                                        $('#supplierName').append("<option value='" + data.data[i].supplierName + "'>" + data.data[i].supplierName + "</option>");
+                                    }
+                                }
+                                form.render("select");
+                            }
+                        });
+                        form.render("select");
+                    });
+                    //当改变商品名称时，连锁改变商品id
+                    form.on('select(goodsName)', function(data){
+                        var currentGoodsName = data.value;
+                        $("#goodsId").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsName == list.data[i].name){
+                                $('#goodsId').append("<option selected value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }else {
+                                $('#goodsId').append("<option value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }
+                        }
+                        //连锁获得对应商品的供货项
+                        $.ajax({
+                            url: '/supply/supplyList',
+                            dataType: 'json',
+                            type: 'GET',
+                            cache: false,
+                            success: function (data) {
+                                $("#supplyId").empty();//清除原有选项
+                                $("#supplierId").empty();//清除原有选项
+                                $("#supplierName").empty();//清除原有选项
+                                for (var i = 0; i < data.data.length; i++) {
+                                    if(currentGoodsName == data.data[i].goodsName){
+                                        $('#supplyId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                        $('#supplierId').append("<option value='" + data.data[i].supplierId + "'>" + data.data[i].supplierId + "</option>");
+                                        $('#supplierName').append("<option value='" + data.data[i].supplierName + "'>" + data.data[i].supplierName + "</option>");
+                                    }
+                                }
+                                form.render("select");
+                            }
+                        });
+                        form.render("select");
+                    });
+                }else if (category == 'heatsink'){
+                    $.ajax({
+                        url: '/goodsTech/heatsinkList',
+                        dataType: 'json',
+                        type: 'GET',
+                        cache: false,
+                        success: function (data) {
+                            $("#goodsId").empty();//清除原有选项
+                            $("#goodsName").empty();//清除原有选项
+                            $('#goodsId').append("<option value=''>请选择</option>");
+                            $('#goodsName').append("<option value=''>请选择</option>");
+                            for (var i = 0; i < data.data.length; i++) {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                            form.render("select");
+                            list = data;
+                        }
+                    });
+                    //当改变商品id时，连锁改变商品名称
+                    form.on('select(goodsId)', function(data){
+                        var currentGoodsId = data.value;
+                        $("#goodsName").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsId == list.data[i].id){
+                                $('#goodsName').append("<option selected value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }else {
+                                $('#goodsName').append("<option value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }
+                        }
+                        //连锁获取对应商品的供货项
+                        $.ajax({
+                            url: '/supply/supplyList',
+                            dataType: 'json',
+                            type: 'GET',
+                            cache: false,
+                            success: function (data) {
+                                $("#supplyId").empty();//清除原有选项
+                                $("#supplierId").empty();//清除原有选项
+                                $("#supplierName").empty();//清除原有选项
+                                for (var i = 0; i < data.data.length; i++) {
+                                    if(currentGoodsId == data.data[i].goodsId){
+                                        $('#supplyId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                        $('#supplierId').append("<option value='" + data.data[i].supplierId + "'>" + data.data[i].supplierId + "</option>");
+                                        $('#supplierName').append("<option value='" + data.data[i].supplierName + "'>" + data.data[i].supplierName + "</option>");
+                                    }
+                                }
+                                form.render("select");
+                            }
+                        });
+                        form.render("select");
+                    });
+                    //当改变商品名称时，连锁改变商品id
+                    form.on('select(goodsName)', function(data){
+                        var currentGoodsName = data.value;
+                        $("#goodsId").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsName == list.data[i].name){
+                                $('#goodsId').append("<option selected value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }else {
+                                $('#goodsId').append("<option value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }
+                        }
+                        //连锁获得对应商品的供货项
+                        $.ajax({
+                            url: '/supply/supplyList',
+                            dataType: 'json',
+                            type: 'GET',
+                            cache: false,
+                            success: function (data) {
+                                $("#supplyId").empty();//清除原有选项
+                                $("#supplierId").empty();//清除原有选项
+                                $("#supplierName").empty();//清除原有选项
+                                for (var i = 0; i < data.data.length; i++) {
+                                    if(currentGoodsName == data.data[i].goodsName){
+                                        $('#supplyId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                        $('#supplierId').append("<option value='" + data.data[i].supplierId + "'>" + data.data[i].supplierId + "</option>");
+                                        $('#supplierName').append("<option value='" + data.data[i].supplierName + "'>" + data.data[i].supplierName + "</option>");
+                                    }
+                                }
+                                form.render("select");
+                            }
+                        });
+                        form.render("select");
+                    });
+                }else if (category == 'power'){
+                    $.ajax({
+                        url: '/goodsTech/powerList',
+                        dataType: 'json',
+                        type: 'GET',
+                        cache: false,
+                        success: function (data) {
+                            $("#goodsId").empty();//清除原有选项
+                            $("#goodsName").empty();//清除原有选项
+                            $('#goodsId').append("<option value=''>请选择</option>");
+                            $('#goodsName').append("<option value=''>请选择</option>");
+                            for (var i = 0; i < data.data.length; i++) {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                            form.render("select");
+                            list = data;
+                        }
+                    });
+                    //当改变商品id时，连锁改变商品名称
+                    form.on('select(goodsId)', function(data){
+                        var currentGoodsId = data.value;
+                        $("#goodsName").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsId == list.data[i].id){
+                                $('#goodsName').append("<option selected value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }else {
+                                $('#goodsName').append("<option value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }
+                        }
+                        //连锁获取对应商品的供货项
+                        $.ajax({
+                            url: '/supply/supplyList',
+                            dataType: 'json',
+                            type: 'GET',
+                            cache: false,
+                            success: function (data) {
+                                $("#supplyId").empty();//清除原有选项
+                                $("#supplierId").empty();//清除原有选项
+                                $("#supplierName").empty();//清除原有选项
+                                for (var i = 0; i < data.data.length; i++) {
+                                    if(currentGoodsId == data.data[i].goodsId){
+                                        $('#supplyId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                        $('#supplierId').append("<option value='" + data.data[i].supplierId + "'>" + data.data[i].supplierId + "</option>");
+                                        $('#supplierName').append("<option value='" + data.data[i].supplierName + "'>" + data.data[i].supplierName + "</option>");
+                                    }
+                                }
+                                form.render("select");
+                            }
+                        });
+                        form.render("select");
+                    });
+                    //当改变商品名称时，连锁改变商品id
+                    form.on('select(goodsName)', function(data){
+                        var currentGoodsName = data.value;
+                        $("#goodsId").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsName == list.data[i].name){
+                                $('#goodsId').append("<option selected value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }else {
+                                $('#goodsId').append("<option value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }
+                        }
+                        //连锁获得对应商品的供货项
+                        $.ajax({
+                            url: '/supply/supplyList',
+                            dataType: 'json',
+                            type: 'GET',
+                            cache: false,
+                            success: function (data) {
+                                $("#supplyId").empty();//清除原有选项
+                                $("#supplierId").empty();//清除原有选项
+                                $("#supplierName").empty();//清除原有选项
+                                for (var i = 0; i < data.data.length; i++) {
+                                    if(currentGoodsName == data.data[i].goodsName){
+                                        $('#supplyId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                        $('#supplierId').append("<option value='" + data.data[i].supplierId + "'>" + data.data[i].supplierId + "</option>");
+                                        $('#supplierName').append("<option value='" + data.data[i].supplierName + "'>" + data.data[i].supplierName + "</option>");
+                                    }
+                                }
+                                form.render("select");
+                            }
+                        });
+                        form.render("select");
+                    });
+                }else if (category == 'case'){
+                    $.ajax({
+                        url: '/goodsTech/caseList',
+                        dataType: 'json',
+                        type: 'GET',
+                        cache: false,
+                        success: function (data) {
+                            $("#goodsId").empty();//清除原有选项
+                            $("#goodsName").empty();//清除原有选项
+                            $('#goodsId').append("<option value=''>请选择</option>");
+                            $('#goodsName').append("<option value=''>请选择</option>");
+                            for (var i = 0; i < data.data.length; i++) {
+                                $('#goodsId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#goodsName').append("<option value='" + data.data[i].name + "'>" + data.data[i].name + "</option>");
+                            }
+                            form.render("select");
+                            list = data;
+                        }
+                    });
+                    //当改变商品id时，连锁改变商品名称
+                    form.on('select(goodsId)', function(data){
+                        var currentGoodsId = data.value;
+                        $("#goodsName").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsId == list.data[i].id){
+                                $('#goodsName').append("<option selected value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }else {
+                                $('#goodsName').append("<option value='" + list.data[i].name + "'>" + list.data[i].name + "</option>");
+                            }
+                        }
+                        //连锁获取对应商品的供货项
+                        $.ajax({
+                            url: '/supply/supplyList',
+                            dataType: 'json',
+                            type: 'GET',
+                            cache: false,
+                            success: function (data) {
+                                $("#supplyId").empty();//清除原有选项
+                                $("#supplierId").empty();//清除原有选项
+                                $("#supplierName").empty();//清除原有选项
+                                for (var i = 0; i < data.data.length; i++) {
+                                    if(currentGoodsId == data.data[i].goodsId){
+                                        $('#supplyId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                        $('#supplierId').append("<option value='" + data.data[i].supplierId + "'>" + data.data[i].supplierId + "</option>");
+                                        $('#supplierName').append("<option value='" + data.data[i].supplierName + "'>" + data.data[i].supplierName + "</option>");
+                                    }
+                                }
+                                form.render("select");
+                            }
+                        });
+                        form.render("select");
+                    });
+                    //当改变商品名称时，连锁改变商品id
+                    form.on('select(goodsName)', function(data){
+                        var currentGoodsName = data.value;
+                        $("#goodsId").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentGoodsName == list.data[i].name){
+                                $('#goodsId').append("<option selected value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }else {
+                                $('#goodsId').append("<option value='" + list.data[i].id + "'>" + list.data[i].id + "</option>");
+                            }
+                        }
+                        //连锁获得对应商品的供货项
+                        $.ajax({
+                            url: '/supply/supplyList',
+                            dataType: 'json',
+                            type: 'GET',
+                            cache: false,
+                            success: function (data) {
+                                $("#supplyId").empty();//清除原有选项
+                                $("#supplierId").empty();//清除原有选项
+                                $("#supplierName").empty();//清除原有选项
+                                for (var i = 0; i < data.data.length; i++) {
+                                    if(currentGoodsName == data.data[i].goodsName){
+                                        $('#supplyId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                        $('#supplierId').append("<option value='" + data.data[i].supplierId + "'>" + data.data[i].supplierId + "</option>");
+                                        $('#supplierName').append("<option value='" + data.data[i].supplierName + "'>" + data.data[i].supplierName + "</option>");
+                                    }
+                                }
+                                form.render("select");
+                            }
+                        });
+                        form.render("select");
+                    });
+                }
+            });
+        });
+    </script>
+
+    <!--供货项信息连锁-->
+    <script>
+        layui.use(['form'],function () {
+            var $ = layui.$;
+            var form = layui.form;
+            //当改变供货项id时，连锁改变供货商名称和id
+            form.on('select(supplyId)', function (data) {
+                var currentSupplyId = data.value;
+                var currentGoodsId = document.getElementById("goodsId").value;
+                $.ajax({
+                    url: '/supply/supplyList',
+                    dataType: 'json',
+                    type: 'GET',
+                    cache: false,
+                    success: function (data) {
+                        $("#supplierId").empty();//清除原有选项
+                        $("#supplierName").empty();//清除原有选项
+                        for (var i = 0; i < data.data.length; i++) {
+                            if (currentSupplyId == data.data[i].id && currentGoodsId == data.data[i].goodsId) {
+                                $('#supplierId').append("<option selected value='" + data.data[i].supplierId + "'>" + data.data[i].supplierId + "</option>");
+                                $('#supplierName').append("<option selected value='" + data.data[i].supplierName + "'>" + data.data[i].supplierName + "</option>");
+                                $('#price').attr('value',data.data[i].price);
+                            } else if(currentGoodsId == data.data[i].goodsId){
+                                $('#supplierId').append("<option value='" + data.data[i].supplierId + "'>" + data.data[i].supplierId + "</option>");
+                                $('#supplierName').append("<option value='" + data.data[i].supplierName + "'>" + data.data[i].supplierName + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!--供货商信息连锁-->
+    <script>
+        layui.use(['form'],function () {
+            var $ = layui.$;
+            var form = layui.form;
+            //当改变供货商id时，连锁改变供货商名称和供货项
+            form.on('select(supplierId)', function(data){
+                var currentSupplierId = data.value;
+                var currentGoodsId = document.getElementById("goodsId").value;
+                $.ajax({
+                    url: '/supply/supplyList',
+                    dataType: 'json',
+                    type: 'GET',
+                    cache: false,
+                    success: function (data) {
+                        $("#supplyId").empty();//清除原有选项
+                        $("#supplierName").empty();//清除原有选项
+                        for (var i = 0; i < data.data.length; i++) {
+                            if(currentSupplierId == data.data[i].supplierId && currentGoodsId == data.data[i].goodsId){
+                                $('#supplyId').append("<option selected value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#supplierName').append("<option selected value='" + data.data[i].supplierName + "'>" + data.data[i].supplierName + "</option>");
+                                $('#price').attr('value',data.data[i].price);
+                            }else if(currentGoodsId == data.data[i].goodsId){
+                                $('#supplierName').append("<option value='" + data.data[i].supplierName + "'>" + data.data[i].supplierName + "</option>");
+                                $('#supplyId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    }
+                });
+            });
+            //当改变供货商名称时，连锁改变供货商id和供货项
+            form.on('select(supplierName)', function(data){
+                var currentSupplierName = data.value;
+                var currentGoodsId = document.getElementById("goodsId").value;
+                $.ajax({
+                    url: '/supply/supplyList',
+                    dataType: 'json',
+                    type: 'GET',
+                    cache: false,
+                    success: function (data) {
+                        $("#supplierId").empty();//清除原有选项
+                        $("#supplyId").empty();//清除原有选项
+                        for (var i = 0; i < data.data.length; i++) {
+                            if(currentSupplierName == data.data[i].supplierName && currentGoodsId == data.data[i].goodsId){
+                                $('#supplyId').append("<option selected value='" + data.data[i].supplierId + "'>" + data.data[i].supplierId + "</option>");
+                                $('#supplierId').append("<option selected value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                $('#price').attr('value',data.data[i].price);
+                            }else if(currentGoodsId == data.data[i].goodsId){
+                                $('#supplierId').append("<option value='" + data.data[i].supplierId + "'>" + data.data[i].supplierId + "</option>");
+                                $('#supplyId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

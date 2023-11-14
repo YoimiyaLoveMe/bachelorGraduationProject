@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>商品一览表</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/html" id="indexTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+
+    <!--外部js-->
+<!--    <script type="text/javascript" src=""></script>-->
+
+</head>
+<body class="layui-layout-body">
+    <div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+
+                    <div class="layui-card-header">当前商品类:
+                        <select name="goodsclass" id="goodsclass">
+                            <option value="goods_motherboard">主板</option>
+                            <option value="goods_cpu">芯片</option>
+                            <option value="goods_graphics_card">显卡</option>
+                            <option value="goods_ram">内存</option>
+                            <option value="goods_ssd">硬盘</option>
+                            <option value="goods_heatsink">散热器</option>
+                            <option value="goods_power">电源</option>
+                            <option value="goods_case">机箱</option>
+                        </select>
+                    </div>
+
+                    <div class="layui-card-body">
+                        <table class="layui-hide" id="main-table" lay-filter="main-table"></table>
+                        <script type="text/html" id="toolbarDemo">
+                            <!--查询-->
+                            <span class="layui-inline" style="width: 240px;">
+                                <input class="layui-input" name="param" id="param" placeholder="商品名称查询" autocomplete="off">
+                            </span>
+                            <span class="layui-btn layui-btn-sm layui-bg-red" lay-event="querySearch">
+                                <i class="layui-icon">&#xe615;</i>查询
+                            </span>
+                        </script>
+                        <script type="text/html" id="barDemo">
+                            <a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>
+                            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="onsale">上架</a>
+                            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="offsale">下架</a>
+                        </script>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/static/layui/layui.js}"></script>
+    <!--初始表为主板-->
+    <script>window.onload=function(){motherboard();}</script>
+    <script>
+        <!--选项改动时执行函数-->
+        $("#goodsclass").change(function(){
+            switch ($("#goodsclass").val()){
+                case 'goods_motherboard':
+                    motherboard();
+                    break;
+                case 'goods_cpu':
+                    cpu();
+                    break;
+                case 'goods_graphics_card':
+                    graphicscard();
+                    break;
+                case 'goods_ram':
+                    ram();
+                    break;
+                case 'goods_ssd':
+                    ssd();
+                    break;
+                case 'goods_heatsink':
+                    heatsink();
+                    break;
+                case 'goods_power':
+                    power();
+                    break;
+                case 'goods_case':
+                    thecase();
+                    break;
+            }
+        });
+    </script>
+
+    <!------------------------------------------------------------------------------------------------------------------主板-->
+    <script>
+        function motherboard(){
+            layui.use(['table','form'],function () {
+                var $ = layui.$;
+                var table = layui.table;
+                //定义当前页面表格
+                table.render({
+                    elem: '#main-table',
+                    height: 600,
+                    url: '/goodsSale/motherboardQueryPage',
+                    method: 'POST',
+                    page: true,
+                    id: 'table-load',
+                    toolbar: '#toolbarDemo',
+                    cols: [
+                        [
+                            //field应与entity中定义的一致
+                            //align:'center' 内容居中
+                            //sort: true 开启排序
+                            {field: 'id', title: '商品ID', align: 'center',sort: true,width: '6%'},
+                            {field: 'name', title: '名称', align: 'center'},
+                            {field: 'brand', title: '品牌', align: 'center'},
+                            {field: 'picture',title: '展示图',align: 'center'},
+                            {field: 'salePrice', title: '促销价', align: 'center'},
+                            {field: 'price', title: '原价', align: 'center'},
+                            {field: 'information', title: '描述', align: 'center'},
+                            {field: 'safeStock', title: '安全库存', align: 'center'},
+                            {field: 'isSale', title: '是否在售', align: 'center',
+                                templet:function (line){
+                                    var flag = false;
+                                    $.ajax({
+                                        type: "GET",
+                                        url : "/goodsSale/isSale?id=" + line.id,
+                                        async: false,
+                                        cache: false,
+                                        success: function (data) {
+                                            flag = data;
+                                        }
+                                    })
+                                    if (flag){
+                                        return "在售";
+                                    }else {
+                                        return "未上架";
+                                    }
+                                }},
+                            {field: 'sales', title: '累计销量', align: 'center',sort: true,
+                                templet:function (line){
+                                    var number = 0;
+                                    $.ajax({
+                                        type: "GET",
+                                        url : "/goodsSale/getSales?id=" + line.id,
+                                        async: false,
+                                        cache: false,
+                                        success: function (data) {
+                                            number = data;
+                                        }
+                                    })
+                                    return number;
+                                }},
+                            {title: '操作', align: 'center', toolbar: '#barDemo', fixed: 'right',width: '10%'},//fixed:'right':靠右顶格
+                        ]
+                    ]
+                });
+                // 监听头工具栏事件（查询）
+                table.on('toolbar(main-table)', function (obj) {
+                    switch (obj.event) {
+
+                        //查询
+                        case 'querySearch':
+                            var param = $('#param').val();
+                            table.reload('table-load', {/*刷新当前页面,绿色为当前页面表格id*/
+                                where: {
+                                    param: param
+                                }
+                            });
+                            $('#param').val(param);/*重现查询内容，防止与页面一同刷新*/
+                            break;
+                    }
+                });
+                // //监听修改和上下架功能
+                table.on('tool(main-table)',function (obj) {
+                    var data = obj.data;
+                    switch (obj.event) {
+                        case 'edit':
+                            layer.open({
+                                type: 2,
+                                title: '修改主板信息',
+                                content: '/goodsSale/motherboardQueryById?id=' +data.id,
+                                shade:[0.8,'#393d49'],
+                                area:['600px','650px'],
+                                btn:['确定','取消'],
+                                yes:function (index,layero) {
+                                    var iframeWindow = window['layui-layer-iframe'+index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)',function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsSale/motherboardEdit',
+                                            data: field,
+                                            async: false,
+                                            cache: false,
+                                            success: function (str) {
+                                                if(str.code === 0){
+                                                    table.reload('table-load');
+                                                }
+                                                layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                            }
+                                        });
+                                        layer.close(index);     //关闭弹层
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success:function (layero,index) {
+
+                                }
+                            });
+                            break;
+
+                        case 'onsale':
+                            layer.confirm('确认上架？',function (index) {
+                                $.ajax({
+                                    url: '/goodsSale/onSale?id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+
+                        case 'offsale':
+                            layer.confirm('确认下架？',function (index) {
+                                $.ajax({
+                                    url: '/goodsSale/offSale?id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+                    }
+                });
+            });
+        }
+    </script>
+
+    <!------------------------------------------------------------------------------------------------------------------芯片-->
+    <script>
+        function cpu(){
+            layui.use(['table','form'],function () {
+                var $ = layui.$;
+                var table = layui.table;
+                table.render({
+                    elem: '#main-table',
+                    height: 600,
+                    url: '/goodsSale/cpuQueryPage',
+                    method: 'POST',
+                    page: true,
+                    id: 'table-load',
+                    toolbar: '#toolbarDemo',
+                    cols: [
+                        [
+                            {field: 'id', title: '商品ID', align: 'center',sort: true,width: '6%'},
+                            {field: 'name', title: '名称', align: 'center'},
+                            {field: 'brand', title: '品牌', align: 'center'},
+                            {field: 'picture',title: '展示图',align: 'center'},
+                            {field: 'salePrice', title: '促销价', align: 'center'},
+                            {field: 'price', title: '原价', align: 'center'},
+                            {field: 'information', title: '描述', align: 'center'},
+                            {field: 'safeStock', title: '安全库存', align: 'center'},
+                            {field: 'isSale', title: '是否在售', align: 'center',
+                                templet:function (line){
+                                    var flag = false;
+                                    $.ajax({
+                                        type: "GET",
+                                        url : "/goodsSale/isSale?id=" + line.id,
+                                        async: false,
+                                        cache: false,
+                                        success: function (data) {
+                                            flag = data;
+                                        }
+                                    })
+                                    if (flag){
+                                        return "在售";
+                                    }else {
+                                        return "未上架";
+                                    }
+                                }},
+                            {field: 'sales', title: '累计销量', align: 'center',sort: true,
+                                templet:function (line){
+                                    var number = 0;
+                                    $.ajax({
+                                        type: "GET",
+                                        url : "/goodsSale/getSales?id=" + line.id,
+                                        async: false,
+                                        cache: false,
+                                        success: function (data) {
+                                            number = data;
+                                        }
+                                    })
+                                    return number;
+                                }},
+                            {title: '操作', align: 'center', toolbar: '#barDemo', fixed: 'right',width: '10%'},
+                        ]
+                    ]
+                });
+                // 监听头工具栏事件（查询）
+                table.on('toolbar(main-table)', function (obj) {
+                    switch (obj.event) {
+
+                        //查询
+                        case 'querySearch':
+                            var param = $('#param').val();
+                            table.reload('table-load', {
+                                where: {
+                                    param: param
+                                }
+                            });
+                            $('#param').val(param);
+                            break;
+                    }
+                });
+                // //监听修改和上下架功能
+                table.on('tool(main-table)',function (obj) {
+                    var data = obj.data;
+                    switch (obj.event) {
+                        case 'edit':
+                            layer.open({
+                                type: 2,
+                                title: '修改芯片信息',
+                                content: '/goodsSale/cpuQueryById?id=' +data.id,
+                                shade:[0.8,'#393d49'],
+                                area:['600px','650px'],
+                                btn:['确定','取消'],
+                                yes:function (index,layero) {
+                                    var iframeWindow = window['layui-layer-iframe'+index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)',function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsSale/cpuEdit',
+                                            data: field,
+                                            async: false,
+                                            cache: false,
+                                            success: function (str) {
+                                                if(str.code === 0){
+                                                    table.reload('table-load');
+                                                }
+                                                layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                            }
+                                        });
+                                        layer.close(index);
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success:function (layero,index) {
+
+                                }
+                            });
+                            break;
+
+                        case 'onsale':
+                            layer.confirm('确认上架？',function (index) {
+                                $.ajax({
+                                    url: '/goodsSale/onSale?id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+
+                        case 'offsale':
+                            layer.confirm('确认下架？',function (index) {
+                                $.ajax({
+                                    url: '/goodsSale/offSale?id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+                    }
+                });
+            });
+        }
+    </script>
+
+    <!------------------------------------------------------------------------------------------------------------------显卡-->
+
+    <script>
+        function graphicscard(){
+            layui.use(['table','form'],function () {
+                var $ = layui.$;
+                var table = layui.table;
+                var page = layui.laypage;
+                //定义当前页面表格
+                table.render({
+                    elem: '#main-table',
+                    height: 600,
+                    url: '/goodsSale/graphicscardQueryPage',
+                    method: 'POST',
+                    page: true,
+                    id: 'table-load',
+                    toolbar: '#toolbarDemo',
+                    cols: [
+                        [
+                            //field应与entity中定义的一致
+                            //align:'center' 内容居中
+                            //sort: true 开启排序
+                            {field: 'id', title: '商品ID', align: 'center',sort: true,width: '6%'},
+                            {field: 'name', title: '名称', align: 'center'},
+                            {field: 'brand', title: '品牌', align: 'center'},
+                            {field: 'picture',title: '展示图',align: 'center'},
+                            {field: 'salePrice', title: '促销价', align: 'center'},
+                            {field: 'price', title: '原价', align: 'center'},
+                            {field: 'information', title: '描述', align: 'center'},
+                            {field: 'safeStock', title: '安全库存', align: 'center'},
+                            {field: 'isSale', title: '是否在售', align: 'center',
+                                templet:function (line){
+                                    var flag = false;
+                                    $.ajax({
+                                        type: "GET",
+                                        url : "/goodsSale/isSale?id=" + line.id,
+                                        async: false,
+                                        cache: false,
+                                        success: function (data) {
+                                            flag = data;
+                                        }
+                                    })
+                                    if (flag){
+                                        return "在售";
+                                    }else {
+                                        return "未上架";
+                                    }
+                                }},
+                            {field: 'sales', title: '累计销量', align: 'center',sort: true,
+                                templet:function (line){
+                                    var number = 0;
+                                    $.ajax({
+                                        type: "GET",
+                                        url : "/goodsSale/getSales?id=" + line.id,
+                                        async: false,
+                                        cache: false,
+                                        success: function (data) {
+                                            number = data;
+                                        }
+                                    })
+                                    return number;
+                                }},
+                            {title: '操作', align: 'center', toolbar: '#barDemo', fixed: 'right',width: '10%'},//fixed:'right':靠右顶格
+                        ]
+                    ]
+                });
+                // 监听头工具栏事件（查询）
+                table.on('toolbar(main-table)', function (obj) {
+                    switch (obj.event) {
+
+                        //查询
+                        case 'querySearch':
+                            var param = $('#param').val();
+                            table.reload('table-load', {/*刷新当前页面,绿色为当前页面表格id*/
+                                where: {
+                                    param: param
+                                }
+                            });
+                            $('#param').val(param);/*重现查询内容，防止与页面一同刷新*/
+                            break;
+                    }
+                });
+                // //监听修改和上下架功能
+                table.on('tool(main-table)',function (obj) {
+                    var data = obj.data;
+                    switch (obj.event) {
+                        case 'edit':
+                            layer.open({
+                                type: 2,
+                                title: '修改显卡信息',
+                                content: '/goodsSale/graphicscardQueryById?id=' +data.id,
+                                shade:[0.8,'#393d49'],
+                                area:['600px','650px'],
+                                btn:['确定','取消'],
+                                yes:function (index,layero) {
+                                    var iframeWindow = window['layui-layer-iframe'+index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)',function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsSale/graphicscardEdit',
+                                            data: field,
+                                            async: false,
+                                            cache: false,
+                                            success: function (str) {
+                                                if(str.code === 0){
+                                                    table.reload('table-load');
+                                                }
+                                                layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                            }
+                                        });
+                                        layer.close(index);     //关闭弹层
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success:function (layero,index) {
+
+                                }
+                            });
+                            break;
+
+                        case 'onsale':
+                            layer.confirm('确认上架？',function (index) {
+                                $.ajax({
+                                    url: '/goodsSale/onSale?id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+
+                        case 'offsale':
+                            layer.confirm('确认下架？',function (index) {
+                                $.ajax({
+                                    url: '/goodsSale/offSale?id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+                    }
+                });
+            });
+        }
+    </script>
+
+    <!------------------------------------------------------------------------------------------------------------------内存-->
+    <script>
+        function ram(){
+            layui.use(['table','form'],function () {
+                var $ = layui.$;
+                var table = layui.table;
+                //定义当前页面表格
+                table.render({
+                    elem: '#main-table',
+                    height: 600,
+                    url: '/goodsSale/ramQueryPage',
+                    method: 'POST',
+                    page: true,
+                    id: 'table-load',
+                    toolbar: '#toolbarDemo',
+                    cols: [
+                        [
+                            {field: 'id', title: '商品ID', align: 'center',sort: true,width: '6%'},
+                            {field: 'name', title: '名称', align: 'center'},
+                            {field: 'brand', title: '品牌', align: 'center'},
+                            {field: 'picture',title: '展示图',align: 'center'},
+                            {field: 'salePrice', title: '促销价', align: 'center'},
+                            {field: 'price', title: '原价', align: 'center'},
+                            {field: 'information', title: '描述', align: 'center'},
+                            {field: 'safeStock', title: '安全库存', align: 'center'},
+                            {field: 'isSale', title: '是否在售', align: 'center',
+                                templet:function (line){
+                                    var flag = false;
+                                    $.ajax({
+                                        type: "GET",
+                                        url : "/goodsSale/isSale?id=" + line.id,
+                                        async: false,
+                                        cache: false,
+                                        success: function (data) {
+                                            flag = data;
+                                        }
+                                    })
+                                    if (flag){
+                                        return "在售";
+                                    }else {
+                                        return "未上架";
+                                    }
+                                }},
+                            {field: 'sales', title: '累计销量', align: 'center',sort: true,
+                                templet:function (line){
+                                    var number = 0;
+                                    $.ajax({
+                                        type: "GET",
+                                        url : "/goodsSale/getSales?id=" + line.id,
+                                        async: false,
+                                        cache: false,
+                                        success: function (data) {
+                                            number = data;
+                                        }
+                                    })
+                                    return number;
+                                }},
+                            {title: '操作', align: 'center', toolbar: '#barDemo', fixed: 'right',width: '10%'},
+                        ]
+                    ]
+                });
+                // 监听头工具栏事件（查询）
+                table.on('toolbar(main-table)', function (obj) {
+                    switch (obj.event) {
+
+                        //查询
+                        case 'querySearch':
+                            var param = $('#param').val();
+                            table.reload('table-load', {
+                                where: {
+                                    param: param
+                                }
+                            });
+                            $('#param').val(param);
+                            break;
+                    }
+                });
+                // //监听修改和上下架功能
+                table.on('tool(main-table)',function (obj) {
+                    var data = obj.data;
+                    switch (obj.event) {
+                        case 'edit':
+                            layer.open({
+                                type: 2,
+                                title: '修改散热器信息',
+                                content: '/goodsSale/ramQueryById?id=' +data.id,
+                                shade:[0.8,'#393d49'],
+                                area:['600px','650px'],
+                                btn:['确定','取消'],
+                                yes:function (index,layero) {
+                                    var iframeWindow = window['layui-layer-iframe'+index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)',function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsSale/ramEdit',
+                                            data: field,
+                                            async: false,
+                                            cache: false,
+                                            success: function (str) {
+                                                if(str.code === 0){
+                                                    table.reload('table-load');
+                                                }
+                                                layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                            }
+                                        });
+                                        layer.close(index);
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success:function (layero,index) {
+
+                                }
+                            });
+                            break;
+
+                        case 'onsale':
+                            layer.confirm('确认上架？',function (index) {
+                                $.ajax({
+                                    url: '/goodsSale/onSale?id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+
+                        case 'offsale':
+                            layer.confirm('确认下架？',function (index) {
+                                $.ajax({
+                                    url: '/goodsSale/offSale?id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+                    }
+                });
+            });
+        }
+    </script>
+
+    <!------------------------------------------------------------------------------------------------------------------固态硬盘-->
+    
+    <script>
+        function ssd(){
+            layui.use(['table','form'],function () {
+                var $ = layui.$;
+                var table = layui.table;
+                //定义当前页面表格
+                table.render({
+                    elem: '#main-table',
+                    height: 600,
+                    url: '/goodsSale/ssdQueryPage',
+                    method: 'POST',
+                    page: true,
+                    id: 'table-load',
+                    toolbar: '#toolbarDemo',
+                    cols: [
+                        [
+                            {field: 'id', title: '商品ID', align: 'center',sort: true,width: '6%'},
+                            {field: 'name', title: '名称', align: 'center'},
+                            {field: 'brand', title: '品牌', align: 'center'},
+                            {field: 'picture',title: '展示图',align: 'center'},
+                            {field: 'salePrice', title: '促销价', align: 'center'},
+                            {field: 'price', title: '原价', align: 'center'},
+                            {field: 'information', title: '描述', align: 'center'},
+                            {field: 'safeStock', title: '安全库存', align: 'center'},
+                            {field: 'isSale', title: '是否在售', align: 'center',
+                                templet:function (line){
+                                    var flag = false;
+                                    $.ajax({
+                                        type: "GET",
+                                        url : "/goodsSale/isSale?id=" + line.id,
+                                        async: false,
+                                        cache: false,
+                                        success: function (data) {
+                                            flag = data;
+                                        }
+                                    })
+                                    if (flag){
+                                        return "在售";
+                                    }else {
+                                        return "未上架";
+                                    }
+                                }},
+                            {field: 'sales', title: '累计销量', align: 'center',sort: true,
+                                templet:function (line){
+                                    var number = 0;
+                                    $.ajax({
+                                        type: "GET",
+                                        url : "/goodsSale/getSales?id=" + line.id,
+                                        async: false,
+                                        cache: false,
+                                        success: function (data) {
+                                            number = data;
+                                        }
+                                    })
+                                    return number;
+                                }},
+                            {title: '操作', align: 'center', toolbar: '#barDemo', fixed: 'right',width: '10%'},
+                        ]
+                    ]
+                });
+                // 监听头工具栏事件（查询）
+                table.on('toolbar(main-table)', function (obj) {
+                    switch (obj.event) {
+
+                        //查询
+                        case 'querySearch':
+                            var param = $('#param').val();
+                            table.reload('table-load', {
+                                where: {
+                                    param: param
+                                }
+                            });
+                            $('#param').val(param);
+                            break;
+                    }
+                });
+                // //监听修改和上下架功能
+                table.on('tool(main-table)',function (obj) {
+                    var data = obj.data;
+                    switch (obj.event) {
+                        case 'edit':
+                            layer.open({
+                                type: 2,
+                                title: '修改散热器信息',
+                                content: '/goodsSale/ssdQueryById?id=' +data.id,
+                                shade:[0.8,'#393d49'],
+                                area:['600px','650px'],
+                                btn:['确定','取消'],
+                                yes:function (index,layero) {
+                                    var iframeWindow = window['layui-layer-iframe'+index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)',function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsSale/ssdEdit',
+                                            data: field,
+                                            async: false,
+                                            cache: false,
+                                            success: function (str) {
+                                                if(str.code === 0){
+                                                    table.reload('table-load');
+                                                }
+                                                layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                            }
+                                        });
+                                        layer.close(index);
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success:function (layero,index) {
+
+                                }
+                            });
+                            break;
+
+                        case 'onsale':
+                            layer.confirm('确认上架？',function (index) {
+                                $.ajax({
+                                    url: '/goodsSale/onSale?id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+
+                        case 'offsale':
+                            layer.confirm('确认下架？',function (index) {
+                                $.ajax({
+                                    url: '/goodsSale/offSale?id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+                    }
+                });
+            });
+        }
+    </script>
+
+    <!------------------------------------------------------------------------------------------------------------------散热器-->
+    <script>
+        function heatsink(){
+            layui.use(['table','form'],function () {
+                var $ = layui.$;
+                var table = layui.table;
+                //定义当前页面表格
+                table.render({
+                    elem: '#main-table',
+                    height: 600,
+                    url: '/goodsSale/heatsinkQueryPage',
+                    method: 'POST',
+                    page: true,
+                    id: 'table-load',
+                    toolbar: '#toolbarDemo',
+                    cols: [
+                        [
+                            {field: 'id', title: '商品ID', align: 'center',sort: true,width: '6%'},
+                            {field: 'name', title: '名称', align: 'center'},
+                            {field: 'brand', title: '品牌', align: 'center'},
+                            {field: 'picture',title: '展示图',align: 'center'},
+                            {field: 'salePrice', title: '促销价', align: 'center'},
+                            {field: 'price', title: '原价', align: 'center'},
+                            {field: 'information', title: '描述', align: 'center'},
+                            {field: 'safeStock', title: '安全库存', align: 'center'},
+                            {field: 'isSale', title: '是否在售', align: 'center',
+                                templet:function (line){
+                                    var flag = false;
+                                    $.ajax({
+                                        type: "GET",
+                                        url : "/goodsSale/isSale?id=" + line.id,
+                                        async: false,
+                                        cache: false,
+                                        success: function (data) {
+                                            flag = data;
+                                        }
+                                    })
+                                    if (flag){
+                                        return "在售";
+                                    }else {
+                                        return "未上架";
+                                    }
+                                }},
+                            {field: 'sales', title: '累计销量', align: 'center',sort: true,
+                                templet:function (line){
+                                    var number = 0;
+                                    $.ajax({
+                                        type: "GET",
+                                        url : "/goodsSale/getSales?id=" + line.id,
+                                        async: false,
+                                        cache: false,
+                                        success: function (data) {
+                                            number = data;
+                                        }
+                                    })
+                                    return number;
+                                }},
+                            {title: '操作', align: 'center', toolbar: '#barDemo', fixed: 'right',width: '10%'},
+                        ]
+                    ]
+                });
+                // 监听头工具栏事件（查询）
+                table.on('toolbar(main-table)', function (obj) {
+                    switch (obj.event) {
+
+                        //查询
+                        case 'querySearch':
+                            var param = $('#param').val();
+                            table.reload('table-load', {
+                                where: {
+                                    param: param
+                                }
+                            });
+                            $('#param').val(param);
+                            break;
+                    }
+                });
+                // //监听修改和上下架功能
+                table.on('tool(main-table)',function (obj) {
+                    var data = obj.data;
+                    switch (obj.event) {
+                        case 'edit':
+                            layer.open({
+                                type: 2,
+                                title: '修改散热器信息',
+                                content: '/goodsSale/heatsinkQueryById?id=' +data.id,
+                                shade:[0.8,'#393d49'],
+                                area:['600px','650px'],
+                                btn:['确定','取消'],
+                                yes:function (index,layero) {
+                                    var iframeWindow = window['layui-layer-iframe'+index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)',function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsSale/heatsinkEdit',
+                                            data: field,
+                                            async: false,
+                                            cache: false,
+                                            success: function (str) {
+                                                if(str.code === 0){
+                                                    table.reload('table-load');
+                                                }
+                                                layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                            }
+                                        });
+                                        layer.close(index);
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success:function (layero,index) {
+
+                                }
+                            });
+                            break;
+
+                        case 'onsale':
+                            layer.confirm('确认上架？',function (index) {
+                                $.ajax({
+                                    url: '/goodsSale/onSale?id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+
+                        case 'offsale':
+                            layer.confirm('确认下架？',function (index) {
+                                $.ajax({
+                                    url: '/goodsSale/offSale?id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+                    }
+                });
+            });
+        }
+    </script>
+
+    <!------------------------------------------------------------------------------------------------------------------电源-->
+    
+    <script>
+        function power(){
+            layui.use(['table','form'],function () {
+                var $ = layui.$;
+                var table = layui.table;
+                //定义当前页面表格
+                table.render({
+                    elem: '#main-table',
+                    height: 600,
+                    url: '/goodsSale/powerQueryPage',
+                    method: 'POST',
+                    page: true,
+                    id: 'table-load',
+                    toolbar: '#toolbarDemo',
+                    cols: [
+                        [
+                            {field: 'id', title: '商品ID', align: 'center',sort: true,width: '6%'},
+                            {field: 'name', title: '名称', align: 'center'},
+                            {field: 'brand', title: '品牌', align: 'center'},
+                            {field: 'picture',title: '展示图',align: 'center'},
+                            {field: 'salePrice', title: '促销价', align: 'center'},
+                            {field: 'price', title: '原价', align: 'center'},
+                            {field: 'information', title: '描述', align: 'center'},
+                            {field: 'safeStock', title: '安全库存', align: 'center'},
+                            {field: 'isSale', title: '是否在售', align: 'center',
+                                templet:function (line){
+                                    var flag = false;
+                                    $.ajax({
+                                        type: "GET",
+                                        url : "/goodsSale/isSale?id=" + line.id,
+                                        async: false,
+                                        cache: false,
+                                        success: function (data) {
+                                            flag = data;
+                                        }
+                                    })
+                                    if (flag){
+                                        return "在售";
+                                    }else {
+                                        return "未上架";
+                                    }
+                                }},
+                            {field: 'sales', title: '累计销量', align: 'center',sort: true,
+                                templet:function (line){
+                                    var number = 0;
+                                    $.ajax({
+                                        type: "GET",
+                                        url : "/goodsSale/getSales?id=" + line.id,
+                                        async: false,
+                                        cache: false,
+                                        success: function (data) {
+                                            number = data;
+                                        }
+                                    })
+                                    return number;
+                                }},
+                            {title: '操作', align: 'center', toolbar: '#barDemo', fixed: 'right',width: '10%'},
+                        ]
+                    ]
+                });
+                // 监听头工具栏事件（查询）
+                table.on('toolbar(main-table)', function (obj) {
+                    switch (obj.event) {
+
+                        //查询
+                        case 'querySearch':
+                            var param = $('#param').val();
+                            table.reload('table-load', {
+                                where: {
+                                    param: param
+                                }
+                            });
+                            $('#param').val(param);
+                            break;
+                    }
+                });
+                // //监听修改和上下架功能
+                table.on('tool(main-table)',function (obj) {
+                    var data = obj.data;
+                    switch (obj.event) {
+                        case 'edit':
+                            layer.open({
+                                type: 2,
+                                title: '修改散热器信息',
+                                content: '/goodsSale/powerQueryById?id=' +data.id,
+                                shade:[0.8,'#393d49'],
+                                area:['600px','650px'],
+                                btn:['确定','取消'],
+                                yes:function (index,layero) {
+                                    var iframeWindow = window['layui-layer-iframe'+index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)',function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsSale/powerEdit',
+                                            data: field,
+                                            async: false,
+                                            cache: false,
+                                            success: function (str) {
+                                                if(str.code === 0){
+                                                    table.reload('table-load');
+                                                }
+                                                layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                            }
+                                        });
+                                        layer.close(index);
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success:function (layero,index) {
+
+                                }
+                            });
+                            break;
+
+                        case 'onsale':
+                            layer.confirm('确认上架？',function (index) {
+                                $.ajax({
+                                    url: '/goodsSale/onSale?id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+
+                        case 'offsale':
+                            layer.confirm('确认下架？',function (index) {
+                                $.ajax({
+                                    url: '/goodsSale/offSale?id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+                    }
+                });
+            });
+        }
+    </script>
+
+    <!------------------------------------------------------------------------------------------------------------------机箱-->
+    <script>
+        function thecase(){
+            layui.use(['table','form'],function () {
+                var $ = layui.$;
+                var table = layui.table;
+                //定义当前页面表格
+                table.render({
+                    elem: '#main-table',
+                    height: 600,
+                    url: '/goodsSale/caseQueryPage',
+                    method: 'POST',
+                    page: true,
+                    id: 'table-load',
+                    toolbar: '#toolbarDemo',
+                    cols: [
+                        [
+                            {field: 'id', title: '商品ID', align: 'center',sort: true,width: '6%'},
+                            {field: 'name', title: '名称', align: 'center'},
+                            {field: 'brand', title: '品牌', align: 'center'},
+                            {field: 'picture',title: '展示图',align: 'center'},
+                            {field: 'salePrice', title: '促销价', align: 'center'},
+                            {field: 'price', title: '原价', align: 'center'},
+                            {field: 'information', title: '描述', align: 'center'},
+                            {field: 'safeStock', title: '安全库存', align: 'center'},
+                            {field: 'isSale', title: '是否在售', align: 'center',
+                                templet:function (line){
+                                    var flag = false;
+                                    $.ajax({
+                                        type: "GET",
+                                        url : "/goodsSale/isSale?id=" + line.id,
+                                        async: false,
+                                        cache: false,
+                                        success: function (data) {
+                                            flag = data;
+                                        }
+                                    })
+                                    if (flag){
+                                        return "在售";
+                                    }else {
+                                        return "未上架";
+                                    }
+                                }},
+                            {field: 'sales', title: '累计销量', align: 'center',sort: true,
+                                templet:function (line){
+                                    var number = 0;
+                                    $.ajax({
+                                        type: "GET",
+                                        url : "/goodsSale/getSales?id=" + line.id,
+                                        async: false,
+                                        cache: false,
+                                        success: function (data) {
+                                            number = data;
+                                        }
+                                    })
+                                    return number;
+                                }},
+                            {title: '操作', align: 'center', toolbar: '#barDemo', fixed: 'right',width: '10%'},
+                        ]
+                    ]
+                });
+                // 监听头工具栏事件（查询）
+                table.on('toolbar(main-table)', function (obj) {
+                    switch (obj.event) {
+
+                        //查询
+                        case 'querySearch':
+                            var param = $('#param').val();
+                            table.reload('table-load', {
+                                where: {
+                                    param: param
+                                }
+                            });
+                            $('#param').val(param);
+                            break;
+                    }
+                });
+                // //监听修改和上下架功能
+                table.on('tool(main-table)',function (obj) {
+                    var data = obj.data;
+                    switch (obj.event) {
+                        case 'edit':
+                            layer.open({
+                                type: 2,
+                                title: '修改机箱信息',
+                                content: '/goodsSale/caseQueryById?id=' +data.id,
+                                shade:[0.8,'#393d49'],
+                                area:['600px','650px'],
+                                btn:['确定','取消'],
+                                yes:function (index,layero) {
+                                    var iframeWindow = window['layui-layer-iframe'+index];
+                                    var submit = layero.find('iframe').contents().find("#LAY-front-submit");
+                                    //监听提交
+                                    iframeWindow.layui.form.on('submit(LAY-front-submit)',function (data) {
+                                        var field = data.field;
+                                        $.ajax({
+                                            url: '/goodsSale/caseEdit',
+                                            data: field,
+                                            async: false,
+                                            cache: false,
+                                            success: function (str) {
+                                                if(str.code === 0){
+                                                    table.reload('table-load');
+                                                }
+                                                layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                            }
+                                        });
+                                        layer.close(index);
+                                    });
+                                    submit.trigger('click');
+                                },
+                                success:function (layero,index) {
+
+                                }
+                            });
+                            break;
+
+                        case 'onsale':
+                            layer.confirm('确认上架？',function (index) {
+                                $.ajax({
+                                    url: '/goodsSale/onSale?id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+
+                        case 'offsale':
+                            layer.confirm('确认下架？',function (index) {
+                                $.ajax({
+                                    url: '/goodsSale/offSale?id=' +data.id,
+                                    data: null,
+                                    async: false,
+                                    cache: false,
+                                    success: function (str) {
+                                        table.reload('table-load');
+                                        layer.msg(str.msg,{icon:str.icon,anim:str.anim});
+                                    }
+                                });
+                            })
+                            break;
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

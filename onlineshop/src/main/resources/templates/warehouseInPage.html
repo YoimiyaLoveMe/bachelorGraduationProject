@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>收货记录</title>
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/static/admin/style.css}" media="all">
+    <script type="text/html" id="indexTpl">
+        {{d.LAY_TABLE_INDEX+1}}
+    </script>
+</head>
+<!--<body class="layui-layout-body"> 去掉样式后弹出页面拥有滚动条-->
+<body>
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-card-body" style="padding: 15px;">
+                <form class="layui-form layui-form-pane" action="">
+<!--                    <input name="id" th:value="${obj?.id}" class="layui-input layui-hide">&lt;!&ndash;当使用修改功能时，name为指向数据,th:value="${obj?.}意为收到修改信息&ndash;&gt;-->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">入库编号</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="id" name="id" readonly="readonly" placeholder="自动生成" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">来源类别</label>
+                        <div class="layui-input-block">
+                            <select name="sourceCategory" id="sourceCategory" lay-filter="sourceCategory">
+                                <option value=''>请选择</option>
+                                <option value='物流收货'>物流收货</option>
+                                <option value='库存调拨'>库存调拨</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">前置单号</label>
+                        <div class="layui-input-block">
+                            <select name="sourceId" id="sourceId" lay-filter="sourceId" lay-search>
+                                <option value=''>请先选择来源类别</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">商品编号</label>
+                        <div class="layui-input-block">
+                            <select name="goodsId" id="goodsId" lay-filter="goodsId" readonly="readonly" lay-search>
+                                <option value=''>请先选择前置单号</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">商品名称</label>
+                        <div class="layui-input-block">
+                            <select name="goodsName" id="goodsName" lay-filter="goodsName" readonly="readonly" lay-search>
+                                <option value=''>请先选择前置单号</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">数量</label>
+                        <div class="layui-input-block">
+                            <input type="number" id="number" name="number" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">入库库位</label>
+                        <div class="layui-input-block">
+                            <select name="warehouseId" id="warehouseId" lay-filter="warehouseId" lay-search>
+                            </select>
+                        </div>
+                    </div>
+
+<!--                    弹出隐藏式再次确认按钮-->
+                    <!--竟然会影响添加功能-->
+                    <div class="layui-form-item layui-hide">
+                        <input type="button" lay-submit lay-filter="LAY-front-submit" id="LAY-front-submit" value="确认">
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/static/layui/layui.js}"></script>
+
+
+    <!--来源类别连锁-->
+    <script>
+        layui.use(['form'],function () {
+            var $ = layui.$;
+            var form = layui.form;
+            //获取库位
+            $.ajax({
+                type: "GET",
+                url: "/warehouse/warehouseList",
+                async: false,
+                cache: false,
+                success: function (data) {
+                    for (var i = 0; i < data.data.length; i++){
+                        $('#warehouseId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                    }
+                }
+            })
+            form.on('select(sourceCategory)', function (data) {
+                if('物流收货' == data.value){
+                    var list;
+                    $.ajax({
+                        url: '/logisticsIn/logisticsInList',
+                        dataType: 'json',
+                        type: 'GET',
+                        async: false,
+                        cache: false,
+                        success: function (data) {
+                            $("#sourceId").empty();//清除原有选项
+                            $("#goodsId").empty();//清除原有选项
+                            $("#goodsName").empty();//清除原有选项
+                            $('#sourceId').append("<option value=''>请选择</option>");
+                            for (var i = 0; i < data.data.length; i++) {
+                                $.ajax({
+                                    type: "GET",
+                                    url: "/logisticsIn/getNumber?id=" + data.data[i].id,
+                                    async: false,
+                                    cache: false,
+                                    success: function (number) {
+                                        if(number > 0){
+                                            $('#sourceId').append("<option value='" + data.data[i].id + "'>" + data.data[i].id + "</option>");
+                                        }
+                                    }
+                                })
+                            }
+                            form.render("select");
+                            list = data;
+                        }
+                    });
+                    //前置单号连锁
+                    form.on('select(sourceId)', function(data){
+                        var currentSourceId = data.value;
+                        $("#goodsId").empty();//清除原有选项
+                        $("#goodsName").empty();//清除原有选项
+                        for (var i = 0; i < list.data.length; i++) {
+                            if(currentSourceId == list.data[i].id){
+                                $('#goodsId').append("<option selected value='" + list.data[i].goodsId + "'>" + list.data[i].goodsId + "</option>");
+                                $('#goodsName').append("<option selected value='" + list.data[i].goodsName + "'>" + list.data[i].goodsName + "</option>");
+                            }
+                        }
+                        form.render("select");
+                    });
+                }else if('库存调拨' == data.value){
+
+                }
+
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
